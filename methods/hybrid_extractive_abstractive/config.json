@@ -1,0 +1,15 @@
+{
+    "aspects":[
+        "rooms",
+        "location",
+        "service",
+        "cleanliness",
+        "building",
+        "food"
+    ],
+    "aspect_model": "facebook/bart-large-mnli",
+    "top_k_positive": 20,
+    "top_k_negative": 20,
+    "llm_model": "gemini-2.0-flash",
+    "llm_temperature": 0.5
+}
