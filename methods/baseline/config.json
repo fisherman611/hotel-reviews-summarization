@@ -1,0 +1,11 @@
+{
+    "aspects":[
+        "rooms",
+        "location",
+        "service",
+        "cleanliness",
+        "building",
+        "food"
+    ],
+    "aspect_model": "facebook/bart-large-mnli"
+}
