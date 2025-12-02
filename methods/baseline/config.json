@@ -7,5 +7,6 @@
         "building",
         "food"
     ],
-    "aspect_model": "facebook/bart-large-mnli"
+    "aspect_model": "facebook/bart-large-mnli",
+    "selector_model": "sentence-transformers/all-mpnet-base-v2"
 }
