@@ -25,7 +25,7 @@ ASPECT_MODEL = config["aspect_model"]
 THRESHOLD = config["threshold"]
 SELECTOR_MODEL = config["selector_model"]
 K = config["k"]
-DATA_PATH = "data/test.json"
+DATA_PATH = config["data_path"]
 SUMMARY_OUTPUT_PATH = "outputs/baseline_summaries.json"
 os.makedirs("outputs", exist_ok=True)
 

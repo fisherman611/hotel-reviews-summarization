@@ -10,5 +10,6 @@
     "aspect_model": "facebook/bart-large-mnli",
     "threshold": 0.5,
     "selector_model": "sentence-transformers/all-mpnet-base-v2",
-    "k": 3
+    "k": 3,
+    "data_path": "data/test.json"
 }
