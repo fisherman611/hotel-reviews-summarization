@@ -51,23 +51,3 @@ def group_sentences_by_aspect(entities, aspects=ASPECTS, output_file=None):
             json.dump(result, f, ensure_ascii=False, indent=4)
 
     return result
-
-
-def aspect_extractive_summarizer(topk_sentences: dict):
-    """
-    topk_sentences: dict[aspect -> list[str]]
-    returns: dict[aspect -> str]
-    """
-    aspect_summaries = {}
-
-    # BUGFIX: .items() not .item()
-    for aspect, sentences in topk_sentences.items():
-        if not sentences:
-            aspect_summaries[aspect] = ""
-            continue
-
-        # simple concatenation; you can later swap for nicer formatting / re-writing
-        aspect_summary = " ".join(sentences).strip()
-        aspect_summaries[aspect] = aspect_summary
-
-    return aspect_summaries

@@ -11,10 +11,8 @@ import json
 
 from aspect_classifier import AspectClassifier
 from aspect_sentences_selector import AspectSentencesSelector
-from utils.helpers import (
-    group_sentences_by_aspect,
-    aspect_extractive_summarizer,
-)
+from aspect_extractive_summarizer import aspect_extractive_summarizer
+from utils.helpers import group_sentences_by_aspect
 from tqdm.auto import tqdm
 
 with open("methods/baseline/config.json", "r", encoding="utf-8") as f:
