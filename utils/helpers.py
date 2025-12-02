@@ -38,7 +38,7 @@ def group_sentences_by_aspect(entities, aspects=ASPECTS, output_file=None):
     
     return result
 
-def aspect_abstractive_summarizer(topk_sentences):
+def aspect_extractive_summarizer(topk_sentences):
     aspect_summaries = {}
     
     for aspect, sentences in topk_sentences.item():
