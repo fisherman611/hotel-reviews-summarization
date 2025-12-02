@@ -8,5 +8,7 @@
         "food"
     ],
     "aspect_model": "facebook/bart-large-mnli",
-    "selector_model": "sentence-transformers/all-mpnet-base-v2"
+    "threshold": 0.5,
+    "selector_model": "sentence-transformers/all-mpnet-base-v2",
+    "k": 10
 }
