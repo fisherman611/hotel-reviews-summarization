@@ -8,14 +8,16 @@
         "food"
     ],
     "aspect_model": "facebook/bart-large-mnli",
+    "threshold": 0.5,
     "polarity_model":"facebook/bart-large-mnli",
     "polarities": [
         "positive",
         "neutral",
         "negative"
     ],
-    "top_k_positive": 20,
-    "top_k_negative": 20,
-    "llm_model": "gemini-2.0-flash",
-    "llm_temperature": 0.5
+    "k": 20,
+    "selector_model": "sentence-transformers/all-mpnet-base-v2",
+    "abstractive_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "max_new_tokens": 256,
+    "data_path": "data/test.json"
 }
