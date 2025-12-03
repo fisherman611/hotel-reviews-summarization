@@ -7,5 +7,9 @@
         "building",
         "food"
     ],
-    "aspect_model": "facebook/bart-large-mnli"
+    "aspect_model": "facebook/bart-large-mnli",
+    "threshold": 0.5,
+    "abstractive_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "max_new_tokens": 256,
+    "data_path": "data/test.json"
 }
