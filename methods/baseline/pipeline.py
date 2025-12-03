@@ -27,7 +27,6 @@ DATA_PATH = config["data_path"]
 SUMMARY_OUTPUT_PATH = "outputs/baseline_summaries.json"
 os.makedirs("outputs", exist_ok=True)
 
-# ---------- Step 1: Load input ----------
 with open(DATA_PATH, "r", encoding="utf-8") as f:
     entities = json.load(f)
 
