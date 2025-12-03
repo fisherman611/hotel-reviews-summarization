@@ -16,7 +16,7 @@ The dataset used is the **SPACE** (Semantic-based Pre-training for Aspect-based 
 
 Download from this repo: https://github.com/stangelid/qt
 
-Place the dataset files (`space_summ.json`, `space_train.json`, `space_summ_split.txt`) in the `data/` directory.
+Place the dataset files (`space_summ.json`, `space_train.json`, `space_summ_splits.txt`) in the `data/` directory.
 
 ## **Methods and Models**
 
