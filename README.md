@@ -9,6 +9,7 @@ This project aims to develop a system for automatically summarizing hotel review
 ## **Dataset**
 
 The dataset used is the **SPACE** (Semantic-based Pre-training for Aspect-based Classification and Extraction) dataset, consisting of hotel reviews with aspect-specific summaries. Key characteristics:
+Download from this repo: https://github.com/stangelid/qt
 
 * **Aspects Covered:** Rooms, Location, Service, Cleanliness, Building, and Food.
 * **Data Structure:** Each entity (hotel) contains multiple reviews with sentences and corresponding gold-standard aspect-specific summaries.
