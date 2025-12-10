@@ -1,5 +1,5 @@
 {
-    "aspects":[
+    "aspects": [
         "rooms",
         "location",
         "service",
@@ -7,9 +7,9 @@
         "building",
         "food"
     ],
-    "aspect_model": "facebook/bart-large-mnli",
+    "aspect_model": "MoritzLaurer/deberta-v3-large-zeroshot-v2.0",
     "threshold": 0.5,
-    "polarity_model":"facebook/bart-large-mnli",
+    "polarity_model": "MoritzLaurer/deberta-v3-large-zeroshot-v2.0",
     "polarities": [
         "positive",
         "neutral",

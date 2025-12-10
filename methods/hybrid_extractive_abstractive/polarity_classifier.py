@@ -43,8 +43,13 @@ class PolarityClassifier:
         
         with torch.no_grad():
             logits = self.model(**inputs).logits
-            
-        entail_contra = logits[:, [0, 2]]
+        
+        if POLARITY_MODEL == "facebook/bart-large-mnli":
+            # bart-large-mnli: [contradiction=0, neutral=1, entailment=2]
+            entail_contra = logits[:, [0, 2]]
+        elif POLARITY_MODEL == "MoritzLaurer/deberta-v3-large-zeroshot-v2.0":
+            # deberta-v3-large-zeroshot-v2.0: [entailment=0, not_entailment=1]
+            entail_contra = logits[:, [1, 0]]
         probs = F.softmax(entail_contra, dim=1)
         entail_score = probs[:, 1].item()
         
