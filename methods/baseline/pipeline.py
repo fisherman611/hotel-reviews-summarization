@@ -21,7 +21,6 @@ with open("methods/baseline/config.json", "r", encoding="utf-8") as f:
 ASPECTS = config["aspects"]
 ASPECT_MODEL = config["aspect_model"]
 THRESHOLD = config["threshold"]
-SELECTOR_MODEL = config["selector_model"]
 K = config["k"]
 DATA_PATH = config["data_path"]
 SUMMARY_OUTPUT_PATH = "outputs/baseline_summaries.json"
@@ -81,9 +80,9 @@ def run_baseline_pipeline(
     )
     # NOTE: group_sentences_by_aspect already carries over "summaries" if present.
 
-    # ---------- Step 4: Aspect sentence selector ----------
-    selector = AspectSentencesSelector(model_name=SELECTOR_MODEL, top_k=K)
-    print("STAGE 2: ASPECT SENTENCES SELECTOR")
+    # ---------- Step 4: Aspect sentence selector (random baseline) ----------
+    print("STAGE 2: ASPECT SENTENCES SELECTOR (RANDOM BASELINE)")
+    selector = AspectSentencesSelector(top_k=K)
 
     topk_entities = selector.process(grouped_entities)
 

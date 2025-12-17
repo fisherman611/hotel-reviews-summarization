@@ -6,69 +6,66 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from sentence_transformers import SentenceTransformer, util
-import torch
+import random
 import json
 from typing import Dict, List, Any
 
-with open("methods/baseline/config.json", "r", encoding="utf-8") as f:
-    config = json.load(f)
-
-SELECTOR_MODEL = config["selector_model"]
-
 
 class AspectSentencesSelector:
-    def __init__(
-        self, model_name: str = SELECTOR_MODEL, top_k: int = 3, device: str = None
-    ) -> None:
-        self.model_name = model_name
+    def __init__(self, top_k: int = 3, seed: int = 42) -> None:
+        """
+        Random sentence selector for baseline method.
+        
+        Args:
+            top_k: Number of sentences to select per aspect
+            seed: Random seed for reproducibility
+        """
         self.top_k = top_k
+        self.seed = seed
+        random.seed(self.seed)
 
-        if device is None:
-            self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        else:
-            self.device = device
-
-        self.model = SentenceTransformer(self.model_name, device=self.device)
-
-    def encode_list(self, texts: List[str]) -> torch.Tensor:
-        if not texts:
-            return None
-        return self.model.encode(
-            texts,
-            normalize_embeddings=True,
-        )
-
-    def rank_sentences_for_aspect(
-        self, sentences: List[str], summaries: List[str]
+    def select_random_sentences(
+        self, sentences: List[str]
     ) -> List[Dict[str, Any]]:
-        if not sentences or not summaries:
+        """
+        Randomly select sentences (baseline approach).
+        
+        Args:
+            sentences: List of sentences to select from
+            
+        Returns:
+            List of dictionaries with sentence and score (random)
+        """
+        if not sentences:
             return []
 
-        summary_embs = self.encode_list(summaries)
-        sentence_embs = self.encode_list(sentences)
-
-        sims = util.cos_sim(sentence_embs, summary_embs)
-        avg_scores = sims.mean(dim=1)
-
+        # Create a list with random scores
         ranked = []
-        for sent, score in zip(sentences, avg_scores):
-            ranked.append({"sentence": sent, "score": float(score.item())})
+        for sent in sentences:
+            ranked.append({"sentence": sent, "score": random.random()})
 
+        # Sort by random score
         ranked.sort(key=lambda x: x["score"], reverse=True)
         return ranked
 
     def get_top_k(self, entity: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Select top-k sentences randomly for each aspect.
+        
+        Args:
+            entity: Dictionary containing entity_id, reviews, and summaries
+            
+        Returns:
+            Dictionary with entity_id, topk_sentences, and aspect_sentence_scores
+        """
         aspect_to_sentences = entity.get("reviews", {})
-        aspect_to_summaries = entity.get("summaries", {})
 
         topk_sentences = {}
         aspect_sentence_scores = {}
 
         for aspect, sentences in aspect_to_sentences.items():
-            summaries = aspect_to_summaries.get(aspect, [])
-
-            ranked = self.rank_sentences_for_aspect(sentences, summaries)
+            # Random selection (baseline approach)
+            ranked = self.select_random_sentences(sentences)
             topk = ranked[: self.top_k]
             topk_sentences[aspect] = [item["sentence"] for item in topk]
             aspect_sentence_scores[aspect] = ranked

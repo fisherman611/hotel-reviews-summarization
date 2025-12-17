@@ -7,9 +7,8 @@
         "building",
         "food"
     ],
-    "aspect_model": "facebook/bart-large-mnli",
+    "aspect_model": "MoritzLaurer/deberta-v3-large-zeroshot-v2.0",
     "threshold": 0.5,
-    "selector_model": "sentence-transformers/all-mpnet-base-v2",
     "k": 3,
     "data_path": "data/test.json"
 }
