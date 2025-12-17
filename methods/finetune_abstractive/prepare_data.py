@@ -2,6 +2,7 @@
 Prepare data for instruction tuning following FLAN approach.
 Converts hotel review data into instruction-answer pairs for finetuning.
 """
+import os
 import json
 import sys
 from pathlib import Path
@@ -11,6 +12,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+parent_dir = "data/finetune_abstractive"
+os.makedirs(parent_dir, exist_ok=True)
 
 # Instruction templates following FLAN approach
 # Use {aspect} and {reviews} placeholders for flexibility
@@ -40,12 +43,8 @@ def format_instruction(template: str, aspect: str, reviews: str) -> str:
     Returns:
         Formatted instruction string
     """
-    # Handle article usage for aspects (the location vs location)
-    aspect_with_article = aspect
-    if aspect in ["location", "building"]:
-        aspect_with_article = f"the {aspect}"
     
-    return template.replace("{aspect}", aspect_with_article).replace("{reviews}", reviews)
+    return template.replace("{aspect}", aspect).replace("{reviews}", reviews)
 
 
 def chunk_reviews(reviews: List[Dict[str, Any]], chunk_size: int = 10) -> List[str]:
@@ -262,7 +261,7 @@ if __name__ == "__main__":
     print("Preparing training data with multiple templates...")
     prepare_finetuning_dataset(
         input_path="data/space_train.json",
-        output_path="data/finetuning_train_all_templates.jsonl",
+        output_path="data/finetune_abstractive/finetuning_train_all_templates.jsonl",
         use_all_templates=True
     )
     
@@ -270,7 +269,7 @@ if __name__ == "__main__":
     print("\nPreparing training data with single template...")
     prepare_finetuning_dataset(
         input_path="data/space_train.json",
-        output_path="data/finetuning_train_single_template.jsonl",
+        output_path="data/finetune_abstractive/finetuning_train_single_template.jsonl",
         use_all_templates=False,
         template_index=0
     )
@@ -279,6 +278,6 @@ if __name__ == "__main__":
     print("\nPreparing inference data...")
     prepare_inference_dataset(
         input_path="data/test.json",
-        output_path="data/inference_test.json",
+        output_path="data/finetune_abstractive/inference_test.json",
         template_index=0
     )
