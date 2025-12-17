@@ -7,7 +7,7 @@
         "building",
         "food"
     ],
-    "abstractive_model": "Qwen/Qwen3-0.6B",
+    "abstractive_model": "Qwen/Qwen2.5-0.5B-Instruct",
     "max_new_tokens": 256,
     "data_path": "data/test.json"
 }
