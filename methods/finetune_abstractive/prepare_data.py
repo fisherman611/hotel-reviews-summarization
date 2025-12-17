@@ -109,7 +109,6 @@ def prepare_finetuning_dataset(
         reviews = entity.get("reviews", [])
         gold_summaries = entity.get("summaries", {})
         
-        # Skip if no reviews
         if not reviews:
             continue
         
@@ -121,50 +120,50 @@ def prepare_finetuning_dataset(
             # Get gold summaries for this aspect
             aspect_summaries = gold_summaries.get(aspect, [])
             
-            # Skip if no gold summary
             if not aspect_summaries:
                 continue
             
-            # Use first gold summary as target
-            target_summary = aspect_summaries[0]
-            
-            # Create examples for each chunk
-            # Note: All chunks use the same target summary (the complete gold summary)
-            # The model learns to generate aspect summaries from partial review data
-            for chunk_idx, reviews_text in enumerate(review_chunks):
-                # Format reviews with hotel name
-                formatted_reviews = f"Hotel: {entity_name}\n\n{reviews_text}"
-                
-                if use_all_templates:
-                    # Create one example per template
-                    for template in INSTRUCTION_TEMPLATES:
+            # Use all gold summaries as targets
+            for summary_idx, target_summary in enumerate(aspect_summaries):
+                # Create examples for each chunk
+                # Note: All chunks use the same target summary (the complete gold summary)
+                # The model learns to generate aspect summaries from partial review data
+                for chunk_idx, reviews_text in enumerate(review_chunks):
+                    # Format reviews with hotel name
+                    formatted_reviews = f"Hotel: {entity_name}\n\n{reviews_text}"
+                    
+                    if use_all_templates:
+                        # Create one example per template
+                        for template in INSTRUCTION_TEMPLATES:
+                            instruction = format_instruction(template, aspect, formatted_reviews)
+                            
+                            example = {
+                                "entity_id": entity_id,
+                                "entity_name": entity_name,
+                                "aspect": aspect,
+                                "summary_idx": summary_idx,
+                                "chunk_idx": chunk_idx,
+                                "total_chunks": len(review_chunks),
+                                "instruction": instruction,
+                                "output": target_summary
+                            }
+                            training_examples.append(example)
+                    else:
+                        # Use only one template
+                        template = INSTRUCTION_TEMPLATES[template_index]
                         instruction = format_instruction(template, aspect, formatted_reviews)
                         
                         example = {
                             "entity_id": entity_id,
                             "entity_name": entity_name,
                             "aspect": aspect,
+                            "summary_idx": summary_idx,
                             "chunk_idx": chunk_idx,
                             "total_chunks": len(review_chunks),
                             "instruction": instruction,
                             "output": target_summary
                         }
                         training_examples.append(example)
-                else:
-                    # Use only one template
-                    template = INSTRUCTION_TEMPLATES[template_index]
-                    instruction = format_instruction(template, aspect, formatted_reviews)
-                    
-                    example = {
-                        "entity_id": entity_id,
-                        "entity_name": entity_name,
-                        "aspect": aspect,
-                        "chunk_idx": chunk_idx,
-                        "total_chunks": len(review_chunks),
-                        "instruction": instruction,
-                        "output": target_summary
-                    }
-                    training_examples.append(example)
     
     # Save to JSONL format (common for finetuning)
     with open(output_path, "w", encoding="utf-8") as f:

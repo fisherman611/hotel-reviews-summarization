@@ -11,8 +11,6 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import json
 from typing import Any, List, Dict
 
-# Import template system from prepare_finetuning_data
-# Both files are in the same directory, so direct import works
 from methods.finetune_abstractive.prepare_data import (
     INSTRUCTION_TEMPLATES,
     format_instruction,
@@ -102,7 +100,6 @@ class AspectAbstractiveSummarizer:
         if not reviews_text:
             return None
 
-        # Get instruction template and format it with aspect and reviews
         template = INSTRUCTION_TEMPLATES[self.template_index]
         formatted_reviews = f"Hotel: {entity_name}\n\n{reviews_text}"
         prompt = format_instruction(template, aspect, formatted_reviews)
