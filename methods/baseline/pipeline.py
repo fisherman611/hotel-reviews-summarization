@@ -25,6 +25,7 @@ K = config["k"]
 DATA_PATH = config["data_path"]
 SUMMARY_OUTPUT_PATH = "outputs/baseline_summaries.json"
 TOPK_OUTPUT_PATH = "data/baseline/top_k_output.json"
+GROUPED_OUTPUT_PATH = "data/baseline/grouped_output.json"
 os.makedirs("data/baseline", exist_ok=True)
 os.makedirs("outputs", exist_ok=True)
 
@@ -121,6 +122,7 @@ if __name__ == "__main__":
     # Example usage
 
     result = run_baseline_pipeline(
+        grouped_output_path=GROUPED_OUTPUT_PATH,
         summary_output_path=SUMMARY_OUTPUT_PATH,
         aspect_threshold=THRESHOLD,
         topk_output_path=TOPK_OUTPUT_PATH
