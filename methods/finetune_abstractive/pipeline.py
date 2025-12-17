@@ -95,13 +95,6 @@ def run_finetune_abstractive_pipeline(
 
 
 if __name__ == "__main__":
-    """
-    Example usage:
-
-    1. First, finetune your model using the prepared data from prepare_finetuning_data.py
-    2. Then use this pipeline for inference with the finetuned model
-    """
-
     # Run pipeline with finetuned model
     results = run_finetune_abstractive_pipeline(
         data_path=DATA_PATH,
