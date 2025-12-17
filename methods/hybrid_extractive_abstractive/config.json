@@ -12,7 +12,6 @@
     "polarity_model": "MoritzLaurer/deberta-v3-large-zeroshot-v2.0",
     "polarities": [
         "positive",
-        "neutral",
         "negative"
     ],
     "k": 20,
