@@ -11,7 +11,7 @@ import torch
 import json
 from typing import Dict, List, Any
 
-with open("methods/baseline/config.json", "r", encoding="utf-8") as f:
+with open("methods/hybrid_extractive_abstractive/config.json", "r", encoding="utf-8") as f:
     config = json.load(f)
 
 SELECTOR_MODEL = config["selector_model"]
@@ -37,38 +37,63 @@ class AspectSentencesSelector:
         return self.model.encode(
             texts,
             normalize_embeddings=True,
+            convert_to_tensor=True,
         )
 
-    def rank_sentences_for_aspect(
-        self, sentences: List[str], summaries: List[str]
+    def rank_sentences_by_context(
+        self, sentences: List[str], context_sentences: List[str] = None
     ) -> List[Dict[str, Any]]:
-        if not sentences or not summaries:
+        """
+        Rank sentences based on their similarity to the centroid of context embeddings.
+        This selects the most representative sentences from the context.
+        This approach works for both training and inference since it doesn't require golden summaries.
+        
+        Args:
+            sentences: Sentences to rank
+            context_sentences: Optional broader context to compute centroid from.
+                              If None, uses the sentences themselves as context.
+        """
+        if not sentences:
             return []
+        
+        if len(sentences) == 1:
+            return [{"sentence": sentences[0], "score": 1.0}]
 
-        summary_embs = self.encode_list(summaries)
+        # Use provided context or fall back to sentences themselves
+        context = context_sentences if context_sentences else sentences
+        
+        # Encode sentences to rank and context
         sentence_embs = self.encode_list(sentences)
-
-        sims = util.cos_sim(sentence_embs, summary_embs)
-        avg_scores = sims.mean(dim=1)
-
+        context_embs = self.encode_list(context)
+        
+        # Calculate the centroid (mean) of all context embeddings
+        centroid = context_embs.mean(dim=0, keepdim=True)
+        
+        # Calculate similarity of each sentence to the centroid
+        sims = util.cos_sim(sentence_embs, centroid)
+        scores = sims.squeeze()
+        
+        # Create ranked list
         ranked = []
-        for sent, score in zip(sentences, avg_scores):
+        for sent, score in zip(sentences, scores):
             ranked.append({"sentence": sent, "score": float(score.item())})
-
+        
         ranked.sort(key=lambda x: x["score"], reverse=True)
         return ranked
 
     def get_top_k(self, entity: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Select top-k sentences for each aspect using context-based ranking.
+        Uses centroid similarity without requiring golden summaries.
+        """
         aspect_to_sentences = entity.get("reviews", {})
-        aspect_to_summaries = entity.get("summaries", {})
 
         topk_sentences = {}
         aspect_sentence_scores = {}
 
         for aspect, sentences in aspect_to_sentences.items():
-            summaries = aspect_to_summaries.get(aspect, [])
-
-            ranked = self.rank_sentences_for_aspect(sentences, summaries)
+            # Use context-based ranking with the aspect's sentences as context
+            ranked = self.rank_sentences_by_context(sentences)
             topk = ranked[: self.top_k]
             topk_sentences[aspect] = [item["sentence"] for item in topk]
             aspect_sentence_scores[aspect] = ranked
@@ -85,21 +110,29 @@ class AspectSentencesSelector:
 
 class AspectPolaritySentencesSelector(AspectSentencesSelector):
     def get_top_k(self, entity: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Select top-k sentences for each aspect-polarity combination.
+        Uses context-based ranking with full aspect context (all polarities) as the anchor.
+        This approach doesn't require golden summaries and works for both training and inference.
+        """
         aspect_to_polarity_sentences = entity.get("reviews", {})
-        aspect_to_summaries = entity.get("summaries", {})
 
         topk_sentences = {}
         aspect_sentence_scores = {}
 
         for aspect, polarity_dict in aspect_to_polarity_sentences.items():
-            summaries = aspect_to_summaries.get(aspect, [])
-
             topk_sentences[aspect] = {}
             aspect_sentence_scores[aspect] = {}
 
+            # Collect all sentences for this aspect across all polarities as context
+            aspect_context = []
+            for polarity, sentences in polarity_dict.items():
+                aspect_context.extend(sentences)
+
             # polarity_dict is like {"negative": [...], "positive": [...]}
             for polarity, sentences in polarity_dict.items():
-                ranked = self.rank_sentences_for_aspect(sentences, summaries)
+                # Rank sentences using the full aspect context as anchor
+                ranked = self.rank_sentences_by_context(sentences, aspect_context)
                 topk = ranked[: self.top_k]
 
                 topk_sentences[aspect][polarity] = [item["sentence"] for item in topk]
