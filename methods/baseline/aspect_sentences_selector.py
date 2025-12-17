@@ -74,6 +74,7 @@ class AspectSentencesSelector:
             "entity_id": entity["entity_id"],
             "topk_sentences": topk_sentences,
             "aspect_sentence_scores": aspect_sentence_scores,
+            "summaries": entity["summaries"]
         }
 
     def process(self, entities: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

@@ -103,7 +103,8 @@ def run_baseline_pipeline(
         final_summaries.append(
             {
                 "entity_id": ent["entity_id"],
-                "aspect_summaries": aspect_summaries,
+                "generated_summaries": aspect_summaries,
+                "golden_summaries": ent["summaries"]
             }
         )
 
