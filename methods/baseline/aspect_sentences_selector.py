@@ -58,7 +58,7 @@ class AspectSentencesSelector:
         Returns:
             Dictionary with entity_id, topk_sentences, and aspect_sentence_scores
         """
-        aspect_to_sentences = entity.get("reviews", {})
+        aspect_to_sentences = entity.get("grouped_reviews", {})
 
         topk_sentences = {}
         aspect_sentence_scores = {}
