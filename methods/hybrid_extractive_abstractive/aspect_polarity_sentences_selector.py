@@ -86,7 +86,7 @@ class AspectSentencesSelector:
         Select top-k sentences for each aspect using context-based ranking.
         Uses centroid similarity without requiring golden summaries.
         """
-        aspect_to_sentences = entity.get("reviews", {})
+        aspect_to_sentences = entity.get("grouped_reviews", {})
 
         topk_sentences = {}
         aspect_sentence_scores = {}
@@ -112,10 +112,30 @@ class AspectPolaritySentencesSelector(AspectSentencesSelector):
     def get_top_k(self, entity: Dict[str, Any]) -> Dict[str, Any]:
         """
         Select top-k sentences for each aspect-polarity combination.
-        Uses context-based ranking with full aspect context (all polarities) as the anchor.
-        This approach doesn't require golden summaries and works for both training and inference.
+        Uses context-based ranking with full review embeddings as the anchor.
+        
+        This approach:
+        1. Joins sentences in each review to create full reviews (e.g., 100 reviews)
+        2. Embeds all 100 reviews → 100 context embeddings
+        3. Calculates mean of embeddings → Centroid of context
+        4. Ranks aspect-polarity sentences against this centroid
         """
-        aspect_to_polarity_sentences = entity.get("reviews", {})
+        aspect_to_polarity_sentences = entity.get("grouped_reviews", {})
+        
+        # Build full review context from original reviews
+        # Extract reviews and join sentences to create full review texts
+        reviews = entity.get("reviews", [])
+        full_reviews = []
+        for review in reviews:
+            sentences = review.get("sentences", [])
+            # Join all sentences in the review into a single text
+            full_review = " ".join(sentences)
+            full_reviews.append(full_review)
+        print(full_reviews)
+        
+        # Use full reviews as context for embedding
+        # This creates embeddings for each of the 100 reviews
+        review_context = full_reviews if full_reviews else []
 
         topk_sentences = {}
         aspect_sentence_scores = {}
@@ -124,15 +144,9 @@ class AspectPolaritySentencesSelector(AspectSentencesSelector):
             topk_sentences[aspect] = {}
             aspect_sentence_scores[aspect] = {}
 
-            # Collect all sentences for this aspect across all polarities as context
-            aspect_context = []
-            for polarity, sentences in polarity_dict.items():
-                aspect_context.extend(sentences)
-
             # polarity_dict is like {"negative": [...], "positive": [...]}
             for polarity, sentences in polarity_dict.items():
-                # Rank sentences using the full aspect context as anchor
-                ranked = self.rank_sentences_by_context(sentences, aspect_context)
+                ranked = self.rank_sentences_by_context(sentences, review_context)
                 topk = ranked[: self.top_k]
 
                 topk_sentences[aspect][polarity] = [item["sentence"] for item in topk]

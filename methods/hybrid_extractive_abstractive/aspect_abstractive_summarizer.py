@@ -242,7 +242,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
 
     def summarize_entity(self, entity: Dict[str, Any]) -> Dict[str, Any]:
         entity_id = entity["entity_id"]
-        aspect_to_polarity = entity.get("reviews", {})
+        aspect_to_polarity = entity.get("grouped_reviews", {})
 
         aspect_summaries: Dict[str, str] = {}
 
