@@ -131,7 +131,6 @@ class AspectPolaritySentencesSelector(AspectSentencesSelector):
             # Join all sentences in the review into a single text
             full_review = " ".join(sentences)
             full_reviews.append(full_review)
-        print(full_reviews)
         
         # Use full reviews as context for embedding
         # This creates embeddings for each of the 100 reviews

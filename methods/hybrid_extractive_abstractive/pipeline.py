@@ -30,6 +30,9 @@ ABSTRACTIVE_MODEL = config["abstractive_model"]
 MAX_NEW_TOKENS = config["max_new_tokens"]
 DATA_PATH = config["data_path"]
 SUMMARY_OUTPUT_PATH = "outputs/hybrid_extractive_abstractive_summaries.json"
+GROUPED_OUTPUT_PATH = "data/hybrid_extractive_abstractive/grouped_output.json"
+TOPK_OUTPUT_PATH = "data/hybrid_extractive_abstractive/top_k_output.json"
+os.makedirs("data/hybrid_extractive_abstractive")
 os.makedirs("outputs", exist_ok=True)
 
 
@@ -131,8 +134,10 @@ def run_hybrid_extractive_abstractive(
     
 if __name__ == "__main__":
     result = run_hybrid_extractive_abstractive(
+        grouped_output_path=GROUPED_OUTPUT_PATH,
         summary_output_path=SUMMARY_OUTPUT_PATH,
         aspect_threshold=THRESHOLD,
+        topk_output_path=TOPK_OUTPUT_PATH
     )
     
     print(result)
