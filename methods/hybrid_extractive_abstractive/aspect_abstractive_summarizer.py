@@ -242,6 +242,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
 
     def summarize_entity(self, entity: Dict[str, Any]) -> Dict[str, Any]:
         entity_id = entity["entity_id"]
+        golden_summaries = entity["summaries"]
         aspect_to_polarity = entity.get("grouped_reviews", {})
 
         aspect_summaries: Dict[str, str] = {}
@@ -260,7 +261,8 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
 
         return {
             "entity_id": entity_id,
-            "aspect_summaries": aspect_summaries,
+            "generated_summaries": aspect_summaries,
+            "golden_summaries": golden_summaries
         }
 
     # process() is inherited from AspectAbstractiveSummarizer and still works:

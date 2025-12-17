@@ -1,13 +1,50 @@
 [
     {
         "entity_id": "100597",
-        "aspect_summaries": {
-            "rooms": "The room was ready for us early in the morning, which was a pleasant surprise. The staff was friendly and attentive, and the room rate was excellent. However, some guests found the noise from other rooms disruptive, especially during peak hours when the hotel is busy. Overall, the experience was satisfactory but could have been improved by considering more privacy options.",
-            "location": "The hotel was conveniently located near the airport, providing easy access to transportation options such as the light rail and car rental services. Guests enjoyed various amenities including a children's pool with a temperature higher than those found at the resort in Cancun. While some preferred the convenience of being just a 30-minute walk from downtown Seattle, others appreciated the proximity to restaurants and attractions like Denny's and Jack in the Box. Overall, the location was seen as a significant benefit to guests' travel experience, but it also included drawbacks such as limited accessibility due to the airport location.",
-            "service": "Overall, the service at this hotel is excellent. The staff is friendly, attentive, and takes extra effort to ensure guests' needs are met. Guests appreciate the warm cookies and efficient shuttle service, which helps alleviate their travel stress. While some customers find the expensive internet usage fees unusual, others view these as reasonable expenses for the services provided. Overall, the service is top-notch, making this hotel a preferred choice for travelers seeking comfortable accommodations and convenient transportation options.",
+        "generated_summaries": {
+            "rooms": "The hotel's rooms were well-prepared and arrived promptly upon check-in, though there wasn't enough space to move around comfortably. The staff seemed accommodating but did not provide extensive amenities such as free Wi-Fi or extra bathrooms. Overall, it is recommended for travelers who prefer more personal attention and space.",
+            "location": "The hotel offers a convenient location with easy access to public transportation, amenities such as a pool and laundry facilities, and good connectivity to various attractions. However, some guests found the pool temperature to be too warm compared to their preferred setting. Additionally, while the hotel has a wide range of conveniences, it may not fully meet all guest needs due to its proximity to other amenities. Overall, the location provides a pleasant environment for travelers looking for convenience and a welcoming atmosphere.",
+            "service": "Overall, the hotel received highly favorable feedback for its service, praising friendly staff, clean rooms, convenient shuttle service, and comfortable bed arrangements. However, some customers expressed dissatisfaction due to late check-in fees and concerns over internet usage costs. Overall, the hotel met or exceeded expectations in terms of cleanliness, amenities, and value for money, making it a popular choice among travelers seeking a pleasant stay amidst the bustling airport area.",
             "cleanliness": "",
             "building": "",
             "food": ""
+        },
+        "golden_summaries": {
+            "general": [
+                "The staff are friendly and exceptional. Every room (lobby included) was very clean. They are spacious, very quiet, and come with a coffee maker. Though, the rooms are outdated in decor. The hotel itself is conveniently close to the airport and restaurants. There's a chocolate-chip cookie at arrival, and for the prices, the experience is a good value.",
+                "Service was exceptional and the quality was great! The rooms are always clean, quiet and spacious with nicely appointed bathrooms. The location is across the street from the airport, was within walking distance to a Denny's and other restaurants. The hotel interior itself is a bit outdated, but the room we stayed was modern.",
+                "All the staff was exceptionally helpful, courteous, and friendly, keeping the rooms clean and well-prepared. The interior of the hotel needs updating, but the rooms themselves were very spacious, modern, and comfortable to stay in. The hotel itself is conveniently located near the airport, a steak restaurant, fast food, and has a free shuttle service for broader access to Seattle."
+            ],
+            "rooms": [
+                "The rooms are large and quite, you can't hear the planes taking off at the airport next door. The beds are comfortable and large. The bathrooms are mixed, some need cleaner doors and to be renovated, others seem clean and well appointed. The ice and vending machines are close. The coffee machine in the room is appreciated. The lighting was insufficient, and an old basement smell was present sometimes.",
+                "While close to the airport, it was quiet because of thick windows. The beds were large and comfortable with lots of extra pillows. The bathrooms could use some refurbishment. Furnishings were complete with an ottoman, an easy chair, and a coffee maker. A balcony gives a great view of the surrounding city.",
+                "This hotel features very comfortable and spacious rooms, with balcony, coffeemaker, comfortable beds and were well furnished. Some things that need work is the bad lighting, unkempt bathrooms and smell of mildew. All that being said, the rooms are very quiet even though the hotel is close to the airport."
+            ],
+            "location": [
+                "It's a convenient location close to the airport, with shuttle service to and from the airport that runs every 15 minutes for 24 hours a day. The shuttle service is very good. It's so close you could even walk to the airport if you wanted. It's also in convenient walking distance of many restaurants.",
+                "The airport was convenient to reach with the help of a speedy, twenty-four hour shuttle bus. Also located nearby, within walking distance, was a Denny's, a fast food joint, and a steak house.",
+                "Within walking distance from the airport, this hotel's location is great. There is even a 24 hour shuttle that runs every 15 min that will take you to the airport or some near by places to eat like Denny's Jack in the Box and a steak place."
+            ],
+            "service": [
+                "The staff is exceptionally friendly and helpful both at the front desk and the restaurant. Expect sweet welcoming gifts at your check-in.",
+                "Helpful, courteous, warm staff helps with a wind down after traveling. There is also a chocolate chip cookie at check-in.",
+                "Mostly the staff is extremely helpful and friendly, helping to take the stress out of traveling. The cookies given at check in were greatly appreciated."
+            ],
+            "cleanliness": [
+                "The spacious hotel lobby and rooms are very clean, comfortable, and well-appointed.",
+                "Although the hotel's architecture feels dated, the rooms and bathrooms are clean.",
+                "Even thought there was a minor issue with gaining access to the room because of a faulty magnetic door, the room and bedding were clean and comfortable."
+            ],
+            "building": [
+                "The historical hotel lobby were very attractive. The balcony had a great view of trees . The spa and heated pool is a kid-friendly area and also has wi-fi. There is even a laundry room available to the guests.",
+                "Hotel with very nice lobby and relaxing spa/pool area with lounge and free wifi. The pool is big and kid-friendly. There is also a beautiful view of the trees from the balcony.",
+                "Warm, beautiful, large pool for the family. Old fashioned interior but pleasant rooms, great balcony, and the view outside to the trees was relaxing."
+            ],
+            "food": [
+                "The hotel restaurant's food was nicely presented, and sometimes good. However, sometimes it was bland and tasteless, and a bit pricey. The restaurant's clam chowder was good. The breakfast buffet isn't a bad deal for what you get. The fresh cookies given at check in were delicious.",
+                "Food was well presented and some of it was tasty, if a little pricey, but the clam chowder at the restaurant and the breakfast buffet made the trip all the more worth it. Dave's Diner next door was also enjoyable.",
+                "Although some of the food was bland and a little overpriced, the clam chowder was good. The staff even gave out these delicious freshly baked cookies int he reception area and the breakfast buffet is also a great value for what is offered."
+            ]
         }
     }
 ]

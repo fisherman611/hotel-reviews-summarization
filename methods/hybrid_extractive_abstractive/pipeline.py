@@ -32,7 +32,7 @@ DATA_PATH = config["data_path"]
 SUMMARY_OUTPUT_PATH = "outputs/hybrid_extractive_abstractive_summaries.json"
 GROUPED_OUTPUT_PATH = "data/hybrid_extractive_abstractive/grouped_output.json"
 TOPK_OUTPUT_PATH = "data/hybrid_extractive_abstractive/top_k_output.json"
-os.makedirs("data/hybrid_extractive_abstractive")
+os.makedirs("data/hybrid_extractive_abstractive", exist_ok=True)
 os.makedirs("outputs", exist_ok=True)
 
 
