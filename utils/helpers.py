@@ -37,7 +37,8 @@ def group_sentences_by_aspect(entities, aspects=ASPECTS, output_file=None):
 
         grouped_entity = {
             "entity_id": entity["entity_id"],
-            "reviews": aspect_buckets,
+            "reviews": entity["reviews"],
+            "grouped_reviews": aspect_buckets,
         }
 
         # if original entity already has summaries, keep them
@@ -108,7 +109,8 @@ def group_sentences_by_aspect_polarity(entities, aspects=ASPECTS, output_file=No
 
         grouped_entity = {
             "entity_id": entity["entity_id"],
-            "reviews": aspect_buckets,
+            "reviews": entity["reviews"],
+            "grouped_reviews": aspect_buckets,
         }
 
         # keep summaries if present
