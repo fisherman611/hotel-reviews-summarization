@@ -24,6 +24,8 @@ THRESHOLD = config["threshold"]
 K = config["k"]
 DATA_PATH = config["data_path"]
 SUMMARY_OUTPUT_PATH = "outputs/baseline_summaries.json"
+TOPK_OUTPUT_PATH = "data/baseline/top_k_output.json"
+os.makedirs("data/baseline", exist_ok=True)
 os.makedirs("outputs", exist_ok=True)
 
 with open(DATA_PATH, "r", encoding="utf-8") as f:
@@ -121,5 +123,6 @@ if __name__ == "__main__":
     result = run_baseline_pipeline(
         summary_output_path=SUMMARY_OUTPUT_PATH,
         aspect_threshold=THRESHOLD,
+        topk_output_path=TOPK_OUTPUT_PATH
     )
     print(result)
