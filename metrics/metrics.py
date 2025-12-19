@@ -3,7 +3,6 @@ import evaluate
 
 # Load metrics once at import time
 _rouge = evaluate.load("rouge")
-_bleu = evaluate.load("bleu")
 _meteor = evaluate.load("meteor")
 _bertscore = evaluate.load("bertscore")
 
@@ -56,36 +55,6 @@ def compute_rouge_single(
             "rouge1": 0.0,
             "rouge2": 0.0,
             "rougeL": 0.0,
-        }
-
-
-def compute_bleu_single(
-    prediction: str,
-    references: List[str],
-) -> Dict[str, float]:
-    """
-    Compute BLEU for a single prediction string against multiple references.
-
-    We evaluate (prediction, ref_i) as separate pairs and let the BLEU
-    implementation aggregate at corpus level.
-    """
-    try:
-        predictions, refs = _prepare_single_pair(prediction, references)
-        # BLEU expects references as List[List[str]]
-        wrapped_refs = [[r] for r in refs]
-
-        scores = _bleu.compute(
-            predictions=predictions,
-            references=wrapped_refs,
-        )
-
-        return {
-            "bleu": float(scores["bleu"]),
-        }
-    except (ZeroDivisionError, ValueError, KeyError, TypeError) as e:
-        print(f"Warning: Error computing BLEU scores: {e}. Returning zeros.")
-        return {
-            "bleu": 0.0,
         }
 
 
@@ -175,7 +144,6 @@ def compute_all_metrics_single(
     
     # Each function has its own error handling, so these should be safe
     metrics.update(compute_rouge_single(prediction, references))
-    metrics.update(compute_bleu_single(prediction, references))
     metrics.update(compute_meteor_single(prediction, references))
     metrics.update(compute_bertscore_single(prediction, references, lang=lang))
     
