@@ -16,7 +16,7 @@
     ],
     "k": 20,
     "selector_model": "sentence-transformers/all-mpnet-base-v2",
-    "abstractive_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "abstractive_model": "google/gemma-3-270m-it",
     "max_new_tokens": 256,
     "data_path": "data/test.json"
 }
