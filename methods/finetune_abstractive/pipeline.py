@@ -88,7 +88,7 @@ def run_finetune_abstractive_pipeline(
     # Save results
     if summary_output_path is not None:
         with open(summary_output_path, "w", encoding="utf-8") as f:
-            json.dump(final_summaries, f, ensure_ascii=False, indent=2)
+            json.dump(final_summaries, f, ensure_ascii=False, indent=4)
         print(f"Saved summaries to: {summary_output_path}")
 
     return final_summaries

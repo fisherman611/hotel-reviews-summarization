@@ -99,7 +99,7 @@ def run_hybrid_extractive_abstractive(
                 sentence_polarity.append(pred["predicted_polarity"])
             review["sentence_polarity"] = sentence_polarity
             
-    with open("data/polarity_aspect_classification.json", "w", encoding="utf-8") as f:
+    with open("data/hybrid_extractive_abstractive/polarity_aspect_classification.json", "w", encoding="utf-8") as f:
         json.dump(entities, f, ensure_ascii=False, indent=4)
         
     # ---------- Step 3: Group sentences by aspect and polarity ----------

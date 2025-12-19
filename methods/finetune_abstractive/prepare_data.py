@@ -107,7 +107,7 @@ def prepare_finetuning_dataset(
         entity_id = entity.get("entity_id", "")
         entity_name = entity.get("entity_name", "")
         reviews = entity.get("reviews", [])
-        gold_summaries = entity.get("summaries", {})
+        golden_summaries = entity.get("summaries", {})
         
         if not reviews:
             continue
@@ -118,7 +118,7 @@ def prepare_finetuning_dataset(
         # Create training examples for each aspect
         for aspect in aspects:
             # Get gold summaries for this aspect
-            aspect_summaries = gold_summaries.get(aspect, [])
+            aspect_summaries = golden_summaries.get(aspect, [])
             
             if not aspect_summaries:
                 continue
@@ -206,6 +206,7 @@ def prepare_inference_dataset(
     for entity in entities:
         entity_id = entity.get("entity_id", "")
         entity_name = entity.get("entity_name", "")
+        golden_summaries = entity.get("summaries", {})
         reviews = entity.get("reviews", [])
         
         # Skip if no reviews
@@ -219,7 +220,8 @@ def prepare_inference_dataset(
             "entity_id": entity_id,
             "entity_name": entity_name,
             "total_chunks": len(review_chunks),
-            "aspects": {}
+            "aspects": {},
+            "summaries": golden_summaries
         }
         
         # Create prompts for each aspect

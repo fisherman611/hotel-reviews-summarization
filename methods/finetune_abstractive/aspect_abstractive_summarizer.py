@@ -212,6 +212,7 @@ class AspectAbstractiveSummarizer:
 
         entity_id = entity.get("entity_id", "")
         entity_name = entity.get("entity_name", "")
+        golden_summaries = entity.get("summaries", {})
         reviews = entity.get("reviews", [])
 
         aspect_summaries: Dict[str, str] = {}
@@ -223,7 +224,8 @@ class AspectAbstractiveSummarizer:
         return {
             "entity_id": entity_id,
             "entity_name": entity_name,
-            "aspect_summaries": aspect_summaries,
+            "generated_summaries": aspect_summaries,
+            "golden_summaries": golden_summaries
         }
 
     def process(
