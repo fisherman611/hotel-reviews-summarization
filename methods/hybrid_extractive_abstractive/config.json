@@ -19,7 +19,7 @@
     "abstractive_model": "google/gemma-3-270m-it",
     "max_new_tokens": 256,
     "data_path": "data/test.json",
-    "summary_output_path": "outputs/hybrid_extractive_abstractive_bart_mpnet_gemma_summaries.json",
+    "summary_output_path": "outputs/hybrid_extractive_abstractive/hybrid_extractive_abstractive_bart_mpnet_gemma_summaries.json",
     "grouped_output_path": "data/hybrid_extractive_abstractive_bart_mpnet_gemma/grouped_output.json",
     "topk_output_path": "data/hybrid_extractive_abstractive_bart_mpnet_gemma/top_k_output.json",
     "polarity_aspect_path": "data/hybrid_extractive_abstractive_bart_mpnet_gemma/polarity_aspect_classification.json"
