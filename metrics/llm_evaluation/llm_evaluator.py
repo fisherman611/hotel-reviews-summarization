@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import re
+import time
 import requests
 from pathlib import Path
 from typing import Tuple
@@ -31,6 +32,7 @@ SYSTEM_PROMPT_FILE = SCRIPT_DIR / "system_prompt.txt"
 with open(SYSTEM_PROMPT_FILE, "r", encoding="utf-8") as f:
     SYSTEM_PROMPT = f.read().strip()
 
+os.makedirs("results/llm_eval", exist_ok=True)
 
 def is_json_incomplete(text: str) -> bool:
     """
@@ -288,7 +290,25 @@ IMPORTANT:
     ]
 
 
-def call_deepseek(messages, *, temperature=0, top_p=0.95, max_tokens=8192):
+def call_deepseek(messages, *, temperature=0, top_p=0.95, max_tokens=8192, sleep_before=1.0, sleep_after=0.5):
+    """
+    Call DeepSeek API with rate limiting delays.
+    
+    Args:
+        messages: conversation messages
+        temperature: temperature for LLM
+        top_p: top_p for LLM
+        max_tokens: maximum tokens for response
+        sleep_before: seconds to sleep before API call (default: 1.0)
+        sleep_after: seconds to sleep after API call (default: 0.5)
+    
+    Returns:
+        tuple: (content, is_truncated)
+    """
+    # Sleep before API call to avoid rate limiting
+    if sleep_before > 0:
+        time.sleep(sleep_before)
+    
     payload = {
         "model": "deepseek-ai/deepseek-v3.2",
         "temperature": temperature,
@@ -307,6 +327,10 @@ def call_deepseek(messages, *, temperature=0, top_p=0.95, max_tokens=8192):
     # Check if response was truncated
     finish_reason = choice.get("finish_reason", "")
     is_truncated = finish_reason == "length" or finish_reason == "max_tokens"
+    
+    # Sleep after API call to avoid rate limiting
+    if sleep_after > 0:
+        time.sleep(sleep_after)
     
     return content, is_truncated
 
