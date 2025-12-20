@@ -228,9 +228,9 @@ def reformat_output_for_llm_evaluation(sample, output_file=None):
     
     return result
 
-with open("outputs/baseline_summaries.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-    sample = data[0]  # Get first entity as sample
+# with open("outputs/baseline_summaries.json", "r", encoding="utf-8") as f:
+#     data = json.load(f)
+#     sample = data[0]  # Get first entity as sample
     
-prompt = reformat_output_for_llm_evaluation(sample)
-print(prompt)
+# prompt = reformat_output_for_llm_evaluation(sample)
+# print(prompt)
