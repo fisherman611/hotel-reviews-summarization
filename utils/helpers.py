@@ -153,3 +153,84 @@ def group_sentences_by_aspect_polarity(entities, aspects=ASPECTS, output_file=No
             json.dump(result, f, ensure_ascii=False, indent=4)
 
     return result
+
+def reformat_output_for_llm_evaluation(sample, output_file=None):
+    """
+    Reformat model output summaries for LLM evaluation.
+    
+    Args:
+        sample: a single entity dictionary containing:
+            - entity_id
+            - reviews: list of reviews with review_id and sentences
+            - generated_summaries: dict of aspect -> summary
+            - golden_summaries: dict of aspect -> list of summaries
+        output_file: optional path to save the markdown output
+    
+    Returns:
+        markdown formatted string
+    """
+    markdown_output = []
+    
+    entity_id = sample.get("entity_id", "")
+    reviews = sample.get("reviews", [])
+    generated_summaries = sample.get("generated_summaries", {})
+    golden_summaries = sample.get("golden_summaries", {})
+    
+    # Format reviews section
+    markdown_output.append(f"## Entity ID: {entity_id}\n")
+    markdown_output.append("### Reviews:\n")
+    for review in reviews:
+        review_id = review.get("review_id", "")
+        sentences = review.get("sentences", [])
+        review_text = " ".join(sentences)
+        markdown_output.append(f"- **{review_id}**: {review_text}\n")
+    
+    markdown_output.append("\n")
+    
+    # Get all aspects from generated_summaries
+    aspects = [aspect for aspect in generated_summaries.keys() if aspect != "general"]
+    
+    # Format each aspect
+    for aspect in aspects:
+        generated_summary = generated_summaries.get(aspect, "")
+        golden_summary_list = golden_summaries.get(aspect, [])
+        
+        # Skip if both generated and golden are empty
+        if not generated_summary and not golden_summary_list:
+            continue
+        
+        markdown_output.append(f"### Aspect: {aspect}\n")
+        
+        # Golden summaries
+        markdown_output.append("### Golden Summaries:\n")
+        if golden_summary_list:
+            for golden in golden_summary_list:
+                markdown_output.append(f"- {golden}\n")
+        else:
+            markdown_output.append("- (No golden summary available)\n")
+        
+        markdown_output.append("\n")
+        
+        # Generated summary
+        markdown_output.append("### Generated Summary:\n")
+        if generated_summary:
+            markdown_output.append(f"- {generated_summary}\n")
+        else:
+            markdown_output.append("- (No generated summary)\n")
+        
+        markdown_output.append("\n---\n\n")
+    
+    result = "".join(markdown_output)
+    
+    if output_file:
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(result)
+    
+    return result
+
+with open("outputs/baseline_summaries.json", "r", encoding="utf-8") as f:
+    data = json.load(f)
+    sample = data[0]  # Get first entity as sample
+    
+prompt = reformat_output_for_llm_evaluation(sample)
+print(prompt)
