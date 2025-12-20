@@ -27,12 +27,12 @@ Evaluate how interesting, informative, and readable the summary is.
 - Score 5: The summary is highly engaging, very informative, and captures attention
 
 ### 4. GROUNDEDNESS (1-5)
-Evaluate how well the summary is grounded in the original reviews.
-- Score 1: The summary contains significant hallucinations or information not in reviews
-- Score 2: The summary has several unsupported claims
-- Score 3: The summary is mostly grounded with some minor unsupported details
-- Score 4: The summary is well-grounded with very few unsupported elements
-- Score 5: All information is directly supported by reviews, no hallucinations
+Evaluate how well the summary is grounded in the original reviews. A good summary should synthesize information, not just copy sentences verbatim.
+- Score 1: The summary contains significant hallucinations or information not in reviews, OR the summary is mostly verbatim copy-paste of sentences from reviews without synthesis
+- Score 2: The summary has several unsupported claims, OR the summary contains many verbatim copied sentences with minimal synthesis
+- Score 3: The summary is mostly grounded with some minor unsupported details, OR the summary contains some verbatim copied sentences but also includes some synthesis
+- Score 4: The summary is well-grounded with very few unsupported elements, and synthesizes information rather than copying verbatim
+- Score 5: All information is directly supported by reviews with no hallucinations, and the summary synthesizes and paraphrases information rather than copying sentences verbatim
 
 ## Evaluation Process
 For each summary:
