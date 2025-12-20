@@ -7,9 +7,9 @@
         "building",
         "food"
     ],
-    "aspect_model": "MoritzLaurer/deberta-v3-large-zeroshot-v2.0",
+    "aspect_model": "facebook/bart-large-mnli",
     "threshold": 0.5,
-    "polarity_model": "MoritzLaurer/deberta-v3-large-zeroshot-v2.0",
+    "polarity_model": "facebook/bart-large-mnli",
     "polarities": [
         "positive",
         "negative"
@@ -18,5 +18,9 @@
     "selector_model": "sentence-transformers/all-mpnet-base-v2",
     "abstractive_model": "google/gemma-3-270m-it",
     "max_new_tokens": 256,
-    "data_path": "data/test.json"
+    "data_path": "data/test.json",
+    "summary_output_path": "outputs/hybrid_extractive_abstractive_bart_mpnet_gemma_summaries.json",
+    "grouped_output_path": "data/hybrid_extractive_abstractive_bart_mpnet_gemma/grouped_output.json",
+    "topk_output_path": "data/hybrid_extractive_abstractive_bart_mpnet_gemma/top_k_output.json",
+    "polarity_aspect_path": "data/hybrid_extractive_abstractive_bart_mpnet_gemma/polarity_aspect_classification.json"
 }

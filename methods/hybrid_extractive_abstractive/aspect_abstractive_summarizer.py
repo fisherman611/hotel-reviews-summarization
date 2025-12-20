@@ -10,8 +10,11 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import json
 from typing import Any, List, Dict
-from huggingface_hub import login
-login(token=os.getenv("HF_READ_TOKEN"))
+
+# from dotenv import load_dotenv
+# load_dotenv()
+# from huggingface_hub import login
+# login(token=os.getenv("HF_READ_TOKEN"))
 
 with open("methods/finetune_abstractive/config.json", "r", encoding="utf-8") as f:
     config = json.load(f)

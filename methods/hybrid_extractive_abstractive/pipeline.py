@@ -28,13 +28,16 @@ K = config["k"]
 SELECTOR_MODEL = config["selector_model"]
 ABSTRACTIVE_MODEL = config["abstractive_model"]
 MAX_NEW_TOKENS = config["max_new_tokens"]
-DATA_PATH = config["data_path"]
-SUMMARY_OUTPUT_PATH = "outputs/hybrid_extractive_abstractive_summaries.json"
-GROUPED_OUTPUT_PATH = "data/hybrid_extractive_abstractive/grouped_output.json"
-TOPK_OUTPUT_PATH = "data/hybrid_extractive_abstractive/top_k_output.json"
-os.makedirs("data/hybrid_extractive_abstractive", exist_ok=True)
-os.makedirs("outputs", exist_ok=True)
+DATA_PATH = Path(config["data_path"])
+SUMMARY_OUTPUT_PATH = Path(config["summary_output_path"])
+GROUPED_OUTPUT_PATH = Path(config["grouped_output_path"])
+TOPK_OUTPUT_PATH = Path(config["topk_output_path"])
+POLARITY_ASPECT_PATH = Path(config["polarity_aspect_path"])
 
+os.makedirs(SUMMARY_OUTPUT_PATH.parent, exist_ok=True)
+os.makedirs(GROUPED_OUTPUT_PATH.parent, exist_ok=True)
+os.makedirs(TOPK_OUTPUT_PATH.parent, exist_ok=True)
+os.makedirs(POLARITY_ASPECT_PATH.parent, exist_ok=True)
 
 aspect_abstractive_summarizer = AspectPolarityAbstractiveSummarizer(model_name=ABSTRACTIVE_MODEL, max_new_tokens=MAX_NEW_TOKENS)
 
@@ -99,7 +102,7 @@ def run_hybrid_extractive_abstractive(
                 sentence_polarity.append(pred["predicted_polarity"])
             review["sentence_polarity"] = sentence_polarity
             
-    with open("data/hybrid_extractive_abstractive/polarity_aspect_classification.json", "w", encoding="utf-8") as f:
+    with open(POLARITY_ASPECT_PATH, "w", encoding="utf-8") as f:
         json.dump(entities, f, ensure_ascii=False, indent=4)
         
     # ---------- Step 3: Group sentences by aspect and polarity ----------
