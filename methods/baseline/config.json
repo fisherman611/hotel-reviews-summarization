@@ -13,5 +13,5 @@
     "data_path": "data/test.json",
     "summary_output_path": "outputs/baseline_bart_summaries.json",
     "topk_output_path": "data/baseline_bart/top_k_output.json",
-    "grouped_output_path": "data/baseline_bart/grouped_output_path.json"
+    "grouped_output_path": "data/baseline_bart/grouped_output.json"
 }
