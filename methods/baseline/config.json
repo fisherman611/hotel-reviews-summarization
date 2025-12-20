@@ -7,8 +7,11 @@
         "building",
         "food"
     ],
-    "aspect_model": "MoritzLaurer/deberta-v3-large-zeroshot-v2.0",
+    "aspect_model": "facebook/bart-large-mnli",
     "threshold": 0.5,
-    "k": 3,
-    "data_path": "data/test.json"
+    "k": 20,
+    "data_path": "data/test.json",
+    "summary_output_path": "outputs/baseline_bart_summaries.json",
+    "topk_output_path": "data/baseline_bart/top_k_output.json",
+    "grouped_output_path": "data/baseline_bart/grouped_output_path.json"
 }

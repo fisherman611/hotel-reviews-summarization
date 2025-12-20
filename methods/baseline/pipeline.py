@@ -22,12 +22,14 @@ ASPECTS = config["aspects"]
 ASPECT_MODEL = config["aspect_model"]
 THRESHOLD = config["threshold"]
 K = config["k"]
-DATA_PATH = config["data_path"]
-SUMMARY_OUTPUT_PATH = "outputs/baseline_summaries.json"
-TOPK_OUTPUT_PATH = "data/baseline/top_k_output.json"
-GROUPED_OUTPUT_PATH = "data/baseline/grouped_output.json"
-os.makedirs("data/baseline", exist_ok=True)
-os.makedirs("outputs", exist_ok=True)
+DATA_PATH = Path(config["data_path"])
+SUMMARY_OUTPUT_PATH = Path(config["summary_output_path"])
+TOPK_OUTPUT_PATH = Path(config["topk_output_path"])
+GROUPED_OUTPUT_PATH = Path(config["grouped_output_path"])
+
+os.makedirs(SUMMARY_OUTPUT_PATH.parent, exist_ok=True)
+os.makedirs(TOPK_OUTPUT_PATH.parent, exist_ok=True)
+os.makedirs(GROUPED_OUTPUT_PATH.parent, exist_ok=True)
 
 with open(DATA_PATH, "r", encoding="utf-8") as f:
     entities = json.load(f)
