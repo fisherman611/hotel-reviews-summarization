@@ -15,7 +15,7 @@ dotenv.load_dotenv()
 
 API_KEY = os.getenv("NVIDIA_API_KEY")
 URL = "https://integrate.api.nvidia.com/v1/chat/completions"
-MODEL = "openai/gpt-oss-120b"
+MODEL_DEFAULT = "openai/gpt-oss-120b"
 LAST_REQUEST_TIME = 0
 
 def call_api_with_rate_limit(url, json_payload, headers):
@@ -49,11 +49,13 @@ def sanitize_text(text):
     text = text.strip('"').strip("'")
     return text
 
-def get_summary(reviews_text, version_index):
+def get_summary(reviews_text, version_index, model=None):
     """
     Calls the LLM API to generate aspect-based summaries and extract the hotel name.
     Uses version_index to vary the style and ensures sanitization.
     """
+    if model is None:
+        model = MODEL_DEFAULT
     
     styles = [
         "Write in a balanced and descriptive tone, like a professional travel guide.",
@@ -92,7 +94,7 @@ Reviews:
 """
     
     payload = {
-        "model": MODEL,
+        "model": model,
         "messages": [
             {"role": "user", "content": prompt}
         ],

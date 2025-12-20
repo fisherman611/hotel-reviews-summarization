@@ -1,0 +1,13 @@
+{
+    "aspects": [
+        "rooms",
+        "location",
+        "service",
+        "cleanliness",
+        "building",
+        "food"
+    ],
+    "model_name": "openai/gpt-oss-120b",
+    "data_path": "data/space_summ_test.json",
+    "summary_output_path_template": "outputs/teacher/teacher_summaries_style_{style}.json"
+}
