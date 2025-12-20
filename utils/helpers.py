@@ -154,7 +154,7 @@ def group_sentences_by_aspect_polarity(entities, aspects=ASPECTS, output_file=No
 
     return result
 
-def reformat_output_for_llm_evaluation(sample, output_file=None):
+def reformat_output_for_llm_evaluation(sample, output_file=None, summary_type="generated"):
     """
     Reformat model output summaries for LLM evaluation.
     
@@ -165,6 +165,8 @@ def reformat_output_for_llm_evaluation(sample, output_file=None):
             - generated_summaries: dict of aspect -> summary
             - golden_summaries: dict of aspect -> list of summaries
         output_file: optional path to save the markdown output
+        summary_type: "generated" or "golden" (default: "generated")
+                     Controls which summaries to include in the output
     
     Returns:
         markdown formatted string
@@ -187,38 +189,40 @@ def reformat_output_for_llm_evaluation(sample, output_file=None):
     
     markdown_output.append("\n")
     
-    # Get all aspects from generated_summaries
-    aspects = [aspect for aspect in generated_summaries.keys() if aspect != "general"]
+    # Get all aspects - prioritize generated_summaries, fallback to golden_summaries
+    aspects_from_generated = [aspect for aspect in generated_summaries.keys() if aspect != "general"]
+    aspects_from_golden = [aspect for aspect in golden_summaries.keys() if aspect != "general"]
+    aspects = list(set(aspects_from_generated + aspects_from_golden))
     
     # Format each aspect
     for aspect in aspects:
         generated_summary = generated_summaries.get(aspect, "")
         golden_summary_list = golden_summaries.get(aspect, [])
         
-        # Skip if both generated and golden are empty
-        if not generated_summary and not golden_summary_list:
+        # Determine what to include based on summary_type
+        include_generated = summary_type == "generated" and generated_summary
+        include_golden = summary_type == "golden" and golden_summary_list
+        
+        # Skip if nothing to include for this aspect
+        if not include_generated and not include_golden:
             continue
         
         markdown_output.append(f"### Aspect: {aspect}\n")
         
         # Golden summaries
-        markdown_output.append("### Golden Summaries:\n")
-        if golden_summary_list:
+        if include_golden:
+            markdown_output.append("### Golden Summaries:\n")
             for golden in golden_summary_list:
                 markdown_output.append(f"- {golden}\n")
-        else:
-            markdown_output.append("- (No golden summary available)\n")
-        
-        markdown_output.append("\n")
+            markdown_output.append("\n")
         
         # Generated summary
-        markdown_output.append("### Generated Summary:\n")
-        if generated_summary:
+        if include_generated:
+            markdown_output.append("### Generated Summary:\n")
             markdown_output.append(f"- {generated_summary}\n")
-        else:
-            markdown_output.append("- (No generated summary)\n")
+            markdown_output.append("\n")
         
-        markdown_output.append("\n---\n\n")
+        markdown_output.append("---\n\n")
     
     result = "".join(markdown_output)
     
