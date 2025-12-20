@@ -9,7 +9,7 @@
     ],
     "aspect_model": "facebook/bart-large-mnli",
     "threshold": 0.5,
-    "k": 20,
+    "k": 5,
     "data_path": "data/test.json",
     "summary_output_path": "outputs/baseline_bart_summaries.json",
     "topk_output_path": "data/baseline_bart/top_k_output.json",
