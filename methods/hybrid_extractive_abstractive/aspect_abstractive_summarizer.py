@@ -38,12 +38,32 @@ class AspectAbstractiveSummarizer:
         self.model_name = model_name
         self.max_new_tokens = max_new_tokens
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            dtype="auto",
-            device_map="auto",
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=True)
+        
+        # Check if the model is Llama-based
+        if self.model_name == "meta-llama/Llama-3.2-1B":
+            # Llama-specific loading: explicit device and dtype to avoid disk offload
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            
+            if device == "cuda":
+                dtype = torch.float16  # or torch.bfloat16 if your GPU supports it
+            else:
+                dtype = torch.float32
+            
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                torch_dtype=dtype,
+                device_map=None,          # prevents implicit CPU/disk offload
+                low_cpu_mem_usage=False,  # safer on Windows
+            ).to(device)
+            self.model.eval()
+        else:
+            # Other models (Qwen, Gemma, etc.): use automatic device mapping
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                torch_dtype="auto",
+                device_map="auto",
+            )
 
     def _build_messages(
         self,
@@ -89,17 +109,42 @@ class AspectAbstractiveSummarizer:
         if messages is None:
             return ""
 
-        text = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
-        )
+        # Check if tokenizer has chat template
+        if self.tokenizer.chat_template is not None:
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+        else:
+            # Fallback for base models without chat template
+            # Format as simple prompt
+            selected = sentences[:30]
+            bullet_list = "\n".join(f"- {s}" for s in selected)
+            text = (
+                f"Write one sentence summarizing why hotel reviews are hard to summarize.\n"
+                f"Answer: Summarize hotel reviews for {entity_id} regarding {aspect}.\n\n"
+                f"Review sentences:\n{bullet_list}\n\n"
+                f"Summary:"
+            )
 
         model_inputs = self.tokenizer([text], return_tensors="pt").to(
             self.model.device
         )
 
-        output_ids = self.model.generate(
-            **model_inputs, max_new_tokens=self.max_new_tokens
-        )
+        # Check if model is Llama to use appropriate generation parameters
+        if self.model_name == "meta-llama/Llama-3.2-1B":
+            with torch.inference_mode():
+                output_ids = self.model.generate(
+                    **model_inputs,
+                    max_new_tokens=self.max_new_tokens,
+                    do_sample=True,
+                    temperature=0.7,
+                    top_p=0.95,
+                    pad_token_id=self.tokenizer.eos_token_id,
+                )
+        else:
+            output_ids = self.model.generate(
+                **model_inputs, max_new_tokens=self.max_new_tokens
+            )
 
         input_ids = model_inputs.input_ids
         new_tokens = [output[len(inp) :] for inp, output in zip(input_ids, output_ids)]
@@ -224,17 +269,47 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         if messages is None:
             return ""
 
-        text = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
-        )
+        # Check if tokenizer has chat template
+        if self.tokenizer.chat_template is not None:
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+        else:
+            # Fallback for base models without chat template
+            # Format as simple prompt with polarity
+            half = 15  # max_sentences // 2
+            pos_sel = positive_sentences[:half] if positive_sentences else []
+            neg_sel = negative_sentences[:half] if negative_sentences else []
+            
+            pos_block = "\n".join(f"- {s}" for s in pos_sel) if pos_sel else "(none)"
+            neg_block = "\n".join(f"- {s}" for s in neg_sel) if neg_sel else "(none)"
+            
+            text = (
+                f"Summarize hotel reviews for {entity_id} regarding {aspect}.\n\n"
+                f"Positive reviews:\n{pos_block}\n\n"
+                f"Negative reviews:\n{neg_block}\n\n"
+                f"Write a balanced summary mentioning both positives and negatives:\n"
+            )
 
         model_inputs = self.tokenizer([text], return_tensors="pt").to(
             self.model.device
         )
 
-        output_ids = self.model.generate(
-            **model_inputs, max_new_tokens=self.max_new_tokens
-        )
+        # Check if model is Llama to use appropriate generation parameters
+        if self.model_name == "meta-llama/Llama-3.2-1B":
+            with torch.inference_mode():
+                output_ids = self.model.generate(
+                    **model_inputs,
+                    max_new_tokens=self.max_new_tokens,
+                    do_sample=True,
+                    temperature=0.7,
+                    top_p=0.95,
+                    pad_token_id=self.tokenizer.eos_token_id,
+                )
+        else:
+            output_ids = self.model.generate(
+                **model_inputs, max_new_tokens=self.max_new_tokens
+            )
 
         input_ids = model_inputs.input_ids
         new_tokens = [output[len(inp) :] for inp, output in zip(input_ids, output_ids)]
