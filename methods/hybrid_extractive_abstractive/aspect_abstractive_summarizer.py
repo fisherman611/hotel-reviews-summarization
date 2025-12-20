@@ -39,21 +39,21 @@ class AspectAbstractiveSummarizer:
         self.max_new_tokens = max_new_tokens
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=True)
-        
+
         # Check if the model is Llama-based
         if self.model_name == "meta-llama/Llama-3.2-1B":
             # Llama-specific loading: explicit device and dtype to avoid disk offload
             device = "cuda" if torch.cuda.is_available() else "cpu"
-            
+
             if device == "cuda":
                 dtype = torch.float16  # or torch.bfloat16 if your GPU supports it
             else:
                 dtype = torch.float32
-            
+
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
-                torch_dtype=dtype,
-                device_map=None,          # prevents implicit CPU/disk offload
+                dtype=dtype,
+                device_map=None,  # prevents implicit CPU/disk offload
                 low_cpu_mem_usage=False,  # safer on Windows
             ).to(device)
             self.model.eval()
@@ -61,7 +61,7 @@ class AspectAbstractiveSummarizer:
             # Other models (Qwen, Gemma, etc.): use automatic device mapping
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
-                torch_dtype="auto",
+                dtype="auto",
                 device_map="auto",
             )
 
@@ -78,8 +78,24 @@ class AspectAbstractiveSummarizer:
         selected = sentences[:max_sentences]
         bullet_list = "\n".join(f"- {s}" for s in selected)
 
+        # Few-shot example
+        example_user = (
+            "Hotel: Grand Plaza Hotel\n"
+            "Aspect: location\n\n"
+            "Here are the customer review sentences:\n"
+            "The hotel is conveniently located near the subway station.\n"
+            "Walking distance to many restaurants and shops.\n"
+            "Perfect location for exploring the city center.\n"
+            "Close to major tourist attractions.\n\n"
+            "Write a concise summary of guest opinions about the location."
+        )
+
+        example_assistant = (
+            "Guests praise the hotel's convenient location, with easy access to public transportation, "
+            "nearby restaurants and shops, and proximity to the city center and major tourist attractions."
+        )
+
         user_prompt = (
-            f"You are summarizing hotel reviews.\n\n"
             f"Hotel: {entity_id}\n"
             f"Aspect: {aspect}\n\n"
             f"Here are the customer review sentences:\n"
@@ -90,8 +106,11 @@ class AspectAbstractiveSummarizer:
         messages = [
             {
                 "role": "system",
-                "content": "You are a helpful assistant that summarizes hotel reviews.",
+                "content": "You are a helpful assistant that summarizes hotel reviews. "
+                "Provide concise, informative summaries that capture the main themes from guest feedback.",
             },
+            {"role": "user", "content": example_user},
+            {"role": "assistant", "content": example_assistant},
             {"role": "user", "content": user_prompt},
         ]
         return messages
@@ -115,20 +134,28 @@ class AspectAbstractiveSummarizer:
                 messages, tokenize=False, add_generation_prompt=True
             )
         else:
-            # Fallback for base models without chat template
-            # Format as simple prompt
+            # Fallback for base models without chat template (few-shot format)
             selected = sentences[:30]
             bullet_list = "\n".join(f"- {s}" for s in selected)
             text = (
-                f"Write one sentence summarizing why hotel reviews are hard to summarize.\n"
-                f"Answer: Summarize hotel reviews for {entity_id} regarding {aspect}.\n\n"
-                f"Review sentences:\n{bullet_list}\n\n"
+                f"Task: Summarize hotel reviews for a specific aspect.\n\n"
+                f"Example:\n"
+                f"Hotel: Grand Plaza Hotel\n"
+                f"Aspect: location\n"
+                f"Review sentences:\n"
+                f"The hotel is conveniently located near the subway station.\n"
+                f"Walking distance to many restaurants and shops.\n"
+                f"Perfect location for exploring the city center.\n"
+                f"Summary: Guests praise the hotel's convenient location, with easy access to public transportation, "
+                f"nearby restaurants and shops, and proximity to the city center.\n\n"
+                f"Now summarize:\n"
+                f"Hotel: {entity_id}\n"
+                f"Aspect: {aspect}\n"
+                f"Review sentences:\n{bullet_list}\n"
                 f"Summary:"
             )
 
-        model_inputs = self.tokenizer([text], return_tensors="pt").to(
-            self.model.device
-        )
+        model_inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
 
         # Check if model is Llama to use appropriate generation parameters
         if self.model_name == "meta-llama/Llama-3.2-1B":
@@ -149,9 +176,9 @@ class AspectAbstractiveSummarizer:
         input_ids = model_inputs.input_ids
         new_tokens = [output[len(inp) :] for inp, output in zip(input_ids, output_ids)]
 
-        summary = self.tokenizer.batch_decode(
-            new_tokens, skip_special_tokens=True
-        )[0].strip()
+        summary = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[
+            0
+        ].strip()
 
         return summary
 
@@ -227,8 +254,29 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         pos_block = "\n".join(f"- {s}" for s in pos_sel) if pos_sel else "(none)"
         neg_block = "\n".join(f"- {s}" for s in neg_sel) if neg_sel else "(none)"
 
+        # Few-shot example
+        example_user = (
+            "Hotel: Riverside Inn\n"
+            "Aspect: rooms\n\n"
+            "Here are POSITIVE customer review sentences:\n"
+            "The rooms are spacious and well-decorated.\n"
+            "Clean and comfortable beds.\n"
+            "Modern amenities and great views.\n\n"
+            "Here are NEGATIVE customer review sentences:\n"
+            "The air conditioning was noisy at night.\n"
+            "Bathroom fixtures look outdated.\n"
+            "No minibar in the room.\n\n"
+            "Write a concise, balanced summary (2–3 sentences) of guest opinions "
+            "about the rooms. Mention both what guests like and what they dislike, if applicable."
+        )
+
+        example_assistant = (
+            "Guests appreciate the spacious, well-decorated rooms with clean, comfortable beds and modern amenities. "
+            "However, some guests noted issues with noisy air conditioning at night and outdated bathroom fixtures. "
+            "A few also mentioned the absence of a minibar."
+        )
+
         user_prompt = (
-            f"You are summarizing hotel reviews.\n\n"
             f"Hotel: {entity_id}\n"
             f"Aspect: {aspect}\n\n"
             f"Here are POSITIVE customer review sentences:\n"
@@ -249,6 +297,8 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
                     "positive and negative feedback."
                 ),
             },
+            {"role": "user", "content": example_user},
+            {"role": "assistant", "content": example_assistant},
             {"role": "user", "content": user_prompt},
         ]
         return messages
@@ -259,6 +309,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         aspect: str,
         positive_sentences: List[str],
         negative_sentences: List[str],
+        max_sentences: int = 200,
     ) -> str:
         if not positive_sentences and not negative_sentences:
             return ""
@@ -275,25 +326,36 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
                 messages, tokenize=False, add_generation_prompt=True
             )
         else:
-            # Fallback for base models without chat template
-            # Format as simple prompt with polarity
-            half = 15  # max_sentences // 2
+            # Fallback for base models without chat template (few-shot format)
+            half = max_sentences // 2  # max_sentences // 2
             pos_sel = positive_sentences[:half] if positive_sentences else []
             neg_sel = negative_sentences[:half] if negative_sentences else []
-            
+
             pos_block = "\n".join(f"- {s}" for s in pos_sel) if pos_sel else "(none)"
             neg_block = "\n".join(f"- {s}" for s in neg_sel) if neg_sel else "(none)"
-            
+
             text = (
-                f"Summarize hotel reviews for {entity_id} regarding {aspect}.\n\n"
+                f"Task: Summarize hotel reviews with both positive and negative feedback.\n\n"
+                f"Example:\n"
+                f"Hotel: Riverside Inn\n"
+                f"Aspect: rooms\n"
+                f"Positive reviews:\n"
+                f"The rooms are spacious and well-decorated.\n"
+                f"Clean and comfortable beds.\n"
+                f"Negative reviews:\n"
+                f"The air conditioning was noisy at night.\n"
+                f"Bathroom fixtures look outdated.\n"
+                f"Summary: Guests appreciate the spacious, well-decorated rooms with clean, comfortable beds. "
+                f"However, some guests noted issues with noisy air conditioning and outdated bathroom fixtures.\n\n"
+                f"Now summarize:\n"
+                f"Hotel: {entity_id}\n"
+                f"Aspect: {aspect}\n"
                 f"Positive reviews:\n{pos_block}\n\n"
                 f"Negative reviews:\n{neg_block}\n\n"
-                f"Write a balanced summary mentioning both positives and negatives:\n"
+                f"Summary:"
             )
 
-        model_inputs = self.tokenizer([text], return_tensors="pt").to(
-            self.model.device
-        )
+        model_inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
 
         # Check if model is Llama to use appropriate generation parameters
         if self.model_name == "meta-llama/Llama-3.2-1B":
@@ -314,9 +376,9 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         input_ids = model_inputs.input_ids
         new_tokens = [output[len(inp) :] for inp, output in zip(input_ids, output_ids)]
 
-        summary = self.tokenizer.batch_decode(
-            new_tokens, skip_special_tokens=True
-        )[0].strip()
+        summary = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[
+            0
+        ].strip()
 
         return summary
 
@@ -343,7 +405,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
             "entity_id": entity_id,
             "reviews": entity.get("reviews"),
             "generated_summaries": aspect_summaries,
-            "golden_summaries": golden_summaries
+            "golden_summaries": golden_summaries,
         }
 
     # process() is inherited from AspectAbstractiveSummarizer and still works:
