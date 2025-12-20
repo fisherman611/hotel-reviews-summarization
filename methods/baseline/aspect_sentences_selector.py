@@ -72,6 +72,7 @@ class AspectSentencesSelector:
 
         return {
             "entity_id": entity["entity_id"],
+            "reviews": entity["reviews"],
             "topk_sentences": topk_sentences,
             "aspect_sentence_scores": aspect_sentence_scores,
             "summaries": entity["summaries"]
