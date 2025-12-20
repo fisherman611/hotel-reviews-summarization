@@ -1,10 +1,51 @@
 [
     {
         "entity_id": "100597",
+        "reviews": [
+            {
+                "review_id": "UR59977476",
+                "sentences": [
+                    "We stayed here on a lay over home from Cancun.",
+                    "It was great to have a comfortable bed and room on our final night of holidays.",
+                    "The kids loved the pool which was warmer than the ones at the resort in Cancun which we could not believe as we were in Seattle!",
+                    "The staff was friendly and we appreciated the cookies after a long flight when we were waiting to check inn.",
+                    "Just a nice touch!",
+                    "Shuttle was convenient and would definitely stay here again."
+                ],
+                "rating": 5
+            },
+            {
+                "review_id": "UR116963461",
+                "sentences": [
+                    "I reserved this room through an affiliate travel booking platform and got a great room rate.",
+                    "Aprox.",
+                    "75.00 (not including taxes) for a full day stay.",
+                    "Late check in was effortless and was greeted with a warmed cookie.",
+                    "I think it is fair to mention it costs to use internet in your room but for business travlers I suppose that is an expected cost.",
+                    "Great friendly staff took the edge off our long day of intercontinental travel.",
+                    "I would choose this hotel again as our stop over."
+                ],
+                "rating": 4
+            },
+            {
+                "review_id": "UR115823712",
+                "sentences": [
+                    "We flew into SEA TAC for a few days before our cruise and our travel agent recommended this hotel.",
+                    "The hotel was clean, beds were fine, hotel is located across the street from the air port, was within walking distance to a Denny's, Jack in the Box, and a steak place.",
+                    "Room was ready very early in the morning for us.",
+                    "The kids liked the pool and I was able to do laundry before the cruise.",
+                    "It had easy access to the light rail located at the airport (we took the DT shuttle over), and was next to an Enterprise car rental.",
+                    "Lots of conveniences close by.",
+                    "Downtown Seattle was about a 30 minute ride by light rail service (cost of $16 for the 4 of us) or $40 cab ride to the pier.",
+                    "Hope this helps."
+                ],
+                "rating": 4
+            }
+        ],
         "generated_summaries": {
-            "rooms": "Your hotel offers clean and comfortable rooms, typically arriving early. Guests generally appreciate the good rates and the convenient location within the neighborhood. However, some guests noted that the rooms may not be fully equipped or have facilities not fully present.",
-            "location": "The location of the hotel was a significant drawback. The 30-minute train ride to the pier was inconvenient, and the convenience of the light rail, including the shuttle service, was appreciated. While the hotel provided amenities like a pool, the ease of access to the airport and the proximity to the airport transportation and a Denny's, the kids enjoyed the pool and laundry, but the cleanliness and the hotel's location in the heart of downtown Seattle were negative aspects.",
-            "service": "Overall, guests praised the service and the location, noting the convenient shuttle and friendly staff. However, some guests found the check-in process to be slow and the rooms to be somewhat basic. The hotel's proximity to the airport and near a dining area were also positive aspects.",
+            "rooms": "Hotel: 100597\nAspect: rooms\nHere are POSITIVE customer review sentences:\n- Room was ready very early in the morning for us.\n- We had a fantastic stay, the room was spacious and comfortable.\n- The staff were very friendly and helpful.\n- The breakfast was delicious and included a nice selection of pastries.\n- We enjoyed the hotel's amenities, including the pool.",
+            "location": "The hotel offers convenient location and a pleasant kids' pool, making it a popular choice for families. However, the accessibility to the light rail and airport bus service is a drawback, and the price of the room is higher than the cost of the resort. Guests enjoyed the pool and the proximity to the airport, but found the location to be a bit outside of the city center.",
+            "service": "Guests consistently praise the friendly and efficient staff, particularly the cookies offered after a long flight. They found the staff to be friendly and helpful, and the room ready promptly. However, some guests noted the shuttle service was convenient and were satisfied with the cleanliness and the hotel's location within walking distance to other attractions.",
             "cleanliness": "",
             "building": "",
             "food": ""

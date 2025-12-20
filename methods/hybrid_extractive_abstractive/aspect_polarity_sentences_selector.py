@@ -154,6 +154,7 @@ class AspectPolaritySentencesSelector(AspectSentencesSelector):
         return {
             "entity_id": entity["entity_id"],
             "entity_name": entity.get("entity_name"),
+            "reviews": entity.get("reviews"),
             "topk_sentences": topk_sentences,
             "aspect_sentence_scores": aspect_sentence_scores,
             "summaries": entity["summaries"]

@@ -263,6 +263,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
 
         return {
             "entity_id": entity_id,
+            "reviews": entity.get("reviews"),
             "generated_summaries": aspect_summaries,
             "golden_summaries": golden_summaries
         }
