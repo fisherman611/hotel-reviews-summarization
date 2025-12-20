@@ -17,12 +17,26 @@ def group_sentences_by_aspect(entities, aspects=ASPECTS, output_file=None):
     entities: list of entities with reviews, each review having:
         - "sentences": [...]
         - "sentence_aspects": [[aspect1, aspect2, ...], ...]
+    
+    Output: entities with:
+        - "reviews": original reviews without sentence_aspects
+        - "aspect_reviews": reviews with sentence_aspects
+        - "grouped_reviews": sentences grouped by aspect
     """
     result = []
     for entity in entities:
         aspect_buckets = {aspect: set() for aspect in aspects}
-
-        for review in entity.get("reviews", []):
+        
+        # Copy reviews to aspect_reviews and create clean reviews without sentence_aspects
+        original_reviews = []
+        aspect_reviews = entity.get("reviews", [])
+        
+        for review in aspect_reviews:
+            # Create original review without sentence_aspects
+            original_review = {k: v for k, v in review.items() if k != "sentence_aspects"}
+            original_reviews.append(original_review)
+            
+            # Process sentence_aspects for grouping
             sentences = review.get("sentences", [])
             sentence_aspects = review.get("sentence_aspects", [])
 
@@ -37,7 +51,8 @@ def group_sentences_by_aspect(entities, aspects=ASPECTS, output_file=None):
 
         grouped_entity = {
             "entity_id": entity["entity_id"],
-            "reviews": entity["reviews"],
+            "reviews": original_reviews,
+            "aspect_reviews": aspect_reviews,
             "grouped_reviews": aspect_buckets,
         }
 
@@ -59,10 +74,13 @@ def group_sentences_by_aspect_polarity(entities, aspects=ASPECTS, output_file=No
         - "sentences": [...]
         - "sentence_aspects": [[aspect1, aspect2, ...], ...]
         - "sentence_polarity": ["positive"/"negative"/..., ...]
+    
     Output format per entity:
     {
         "entity_id": ...,
-        "reviews": {
+        "reviews": original reviews without sentence_aspects/sentence_polarity,
+        "aspect_reviews": reviews with sentence_aspects and sentence_polarity,
+        "grouped_reviews": {
             "rooms": {
                 "negative": [...],
                 "positive": [...],
@@ -84,8 +102,18 @@ def group_sentences_by_aspect_polarity(entities, aspects=ASPECTS, output_file=No
             aspect: {"negative": set(), "positive": set()}
             for aspect in aspects
         }
+        
+        # Copy reviews to aspect_reviews and create clean reviews
+        original_reviews = []
+        aspect_reviews = entity.get("reviews", [])
 
-        for review in entity.get("reviews", []):
+        for review in aspect_reviews:
+            # Create original review without sentence_aspects and sentence_polarity
+            original_review = {k: v for k, v in review.items() 
+                             if k not in ("sentence_aspects", "sentence_polarity")}
+            original_reviews.append(original_review)
+            
+            # Process sentence_aspects and sentence_polarity for grouping
             sentences = review.get("sentences", [])
             sentence_aspects = review.get("sentence_aspects", [])
             sentence_polarity = review.get("sentence_polarity", [])
@@ -109,7 +137,8 @@ def group_sentences_by_aspect_polarity(entities, aspects=ASPECTS, output_file=No
 
         grouped_entity = {
             "entity_id": entity["entity_id"],
-            "reviews": entity["reviews"],
+            "reviews": original_reviews,
+            "aspect_reviews": aspect_reviews,
             "grouped_reviews": aspect_buckets,
         }
 
