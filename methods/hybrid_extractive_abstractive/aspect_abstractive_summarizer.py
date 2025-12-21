@@ -22,7 +22,7 @@ with open("methods/finetune_abstractive/config.json", "r", encoding="utf-8") as 
 
 ABSTRACTIVE_MODEL = config["abstractive_model"]
 MAX_NEW_TOKENS = config["max_new_tokens"]
-
+MAX_SENTENCES = config["max_sentences"]
 
 class AspectAbstractiveSummarizer:
     """
@@ -40,31 +40,98 @@ class AspectAbstractiveSummarizer:
         self.max_new_tokens = max_new_tokens
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=True)
-
-        # Model-specific loading strategies
-        device = "cuda" if torch.cuda.is_available() else "cpu"
         
-        if "llama" in self.model_name.lower() or "gemma" in self.model_name.lower():
-            # Llama and Gemma: Explicit device and dtype to avoid disk offload (better for Windows)
-            if device == "cuda":
+        # Fix padding token issues (critical for Gemma and some other models)
+        if self.tokenizer.pad_token is None:
+            if self.tokenizer.eos_token is not None:
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+            else:
+                # Fallback: add a new pad token
+                self.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+        
+        # Model-specific loading strategies
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        # Clear CUDA cache before loading model to prevent memory-related errors
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        
+        if "gemma" in self.model_name.lower():
+            # Gemma: Use device_map for direct CUDA loading (avoids .to() issues)
+            # Gemma prefers bfloat16 (what it was trained on) - fallback to float16 if not supported
+            try:
+                if self.device == "cuda":
+                    # Check if bfloat16 is supported
+                    if torch.cuda.is_bf16_supported():
+                        dtype = torch.bfloat16
+                    else:
+                        dtype = torch.float16
+                    
+                    # Use device_map to load directly to GPU (more stable than .to())
+                    self.model = AutoModelForCausalLM.from_pretrained(
+                        model_name,
+                        torch_dtype=dtype,
+                        device_map={"": 0},  # Load directly to GPU 0
+                        low_cpu_mem_usage=True,
+                    )
+                else:
+                    self.model = AutoModelForCausalLM.from_pretrained(
+                        model_name,
+                        torch_dtype=torch.float32,
+                        device_map=None,
+                    )
+                    
+            except Exception as e:
+                print(f"Error loading Gemma with device_map, trying fallback: {e}")
+                # Fallback: Load to CPU first, then move carefully
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    model_name,
+                    torch_dtype=torch.float32,
+                    device_map=None,
+                    low_cpu_mem_usage=True,
+                )
+                if self.device == "cuda":
+                    self.model = self.model.half().to(self.device)
+            
+            self.model.eval()
+            
+            # Resize embeddings if we added a pad token
+            if self.tokenizer.pad_token == '[PAD]':
+                self.model.resize_token_embeddings(len(self.tokenizer))
+                
+        elif "llama" in self.model_name.lower():
+            # Llama: Explicit device and dtype to avoid disk offload (better for Windows)
+            if self.device == "cuda":
                 dtype = torch.float16  # or torch.bfloat16 if your GPU supports it
             else:
                 dtype = torch.float32
 
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
-                dtype=dtype,
+                torch_dtype=dtype,
                 device_map=None,  # prevents implicit CPU/disk offload
                 low_cpu_mem_usage=False,  # safer on Windows
-            ).to(device)
+            ).to(self.device)
             self.model.eval()
+            
+            # Resize embeddings if we added a pad token
+            if self.tokenizer.pad_token == '[PAD]':
+                self.model.resize_token_embeddings(len(self.tokenizer))
         else:
-            # Other models (Qwen, Gemma, etc.): use automatic device mapping
+            # Other models (Qwen, etc.): use automatic device mapping
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
-                dtype="auto",
+                torch_dtype="auto",
                 device_map="auto",
             )
+            
+            # Resize embeddings if we added a pad token
+            if self.tokenizer.pad_token == '[PAD]':
+                self.model.resize_token_embeddings(len(self.tokenizer))
+        
+        # Store device for easy access
+        if not hasattr(self.model, 'device'):
+            self.model.device = self.device
 
     def _clean_summary(self, summary: str) -> str:
         """Remove thinking process tags and clean up the summary."""
@@ -78,13 +145,34 @@ class AspectAbstractiveSummarizer:
         summary = ' '.join(summary.split())
         
         return summary.strip()
+    
+    def _clear_cuda_cache(self):
+        """Clear CUDA cache to prevent memory issues."""
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    
+    def print_model_info(self):
+        """Print diagnostic information about the model configuration."""
+        print(f"Model: {self.model_name}")
+        print(f"Device: {self.device}")
+        print(f"Tokenizer pad_token: {self.tokenizer.pad_token}")
+        print(f"Tokenizer pad_token_id: {self.tokenizer.pad_token_id}")
+        print(f"Tokenizer eos_token: {self.tokenizer.eos_token}")
+        print(f"Tokenizer eos_token_id: {self.tokenizer.eos_token_id}")
+        print(f"Model vocab size: {self.model.config.vocab_size}")
+        print(f"Tokenizer vocab size: {len(self.tokenizer)}")
+        if torch.cuda.is_available():
+            print(f"CUDA available: Yes")
+            print(f"CUDA device: {torch.cuda.get_device_name(0)}")
+        else:
+            print(f"CUDA available: No")
 
     def _build_messages(
         self,
         entity_id: str,
         aspect: str,
         sentences: List[str],
-        max_sentences: int = 30,
+        max_sentences: int = MAX_SENTENCES,
     ):
         if not sentences:
             return None
@@ -201,6 +289,7 @@ class AspectAbstractiveSummarizer:
         entity_id: str,
         aspect: str,
         sentences: List[str],
+        max_sentences: int = MAX_SENTENCES
     ) -> str:
         if not sentences:
             return ""
@@ -216,7 +305,7 @@ class AspectAbstractiveSummarizer:
             )
         else:
             # Fallback for base models without chat template (few-shot format)
-            selected = sentences[:30]
+            selected = sentences[:max_sentences]
             bullet_list = "\n".join(selected)
             
             # Model-specific fallback prompts
@@ -257,21 +346,51 @@ class AspectAbstractiveSummarizer:
                     f"Summary:"
                 )
 
-        model_inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
+        model_inputs = self.tokenizer(
+            [text], 
+            return_tensors="pt", 
+            padding=True,
+            truncation=True,
+            max_length=2048
+        ).to(self.model.device)
+
+        # Clear CUDA cache before generation (helps prevent memory-related CUDA errors)
+        self._clear_cuda_cache()
 
         # Model-specific generation parameters
         if "gemma" in self.model_name.lower():
-            # Gemma: Lower temperature for more focused outputs
+            # Gemma: Use greedy decoding to avoid CUDA multinomial sampling errors
+            # Greedy decoding is more stable and avoids numerical instability issues
             with torch.inference_mode():
-                output_ids = self.model.generate(
-                    **model_inputs,
-                    max_new_tokens=self.max_new_tokens,
-                    do_sample=True,
-                    temperature=0.6,
-                    top_p=0.9,
-                    top_k=50,
-                    pad_token_id=self.tokenizer.eos_token_id,
-                )
+                try:
+                    output_ids = self.model.generate(
+                        input_ids=model_inputs.input_ids,
+                        attention_mask=model_inputs.attention_mask,
+                        max_new_tokens=self.max_new_tokens,
+                        do_sample=False,  # Greedy decoding - most stable for Gemma
+                        num_beams=1,
+                        pad_token_id=self.tokenizer.pad_token_id,
+                        eos_token_id=self.tokenizer.eos_token_id,
+                    )
+                except RuntimeError as e:
+                    if "CUDA" in str(e):
+                        # Fallback: try on CPU if CUDA fails
+                        print(f"CUDA error detected, attempting CPU fallback: {e}")
+                        original_device = self.device
+                        model_inputs_cpu = {k: v.cpu() for k, v in model_inputs.items()}
+                        self.model.cpu()
+                        output_ids = self.model.generate(
+                            input_ids=model_inputs_cpu["input_ids"],
+                            attention_mask=model_inputs_cpu["attention_mask"],
+                            max_new_tokens=self.max_new_tokens,
+                            do_sample=False,
+                            num_beams=1,
+                            pad_token_id=self.tokenizer.pad_token_id,
+                            eos_token_id=self.tokenizer.eos_token_id,
+                        )
+                        self.model.to(original_device)  # Move back to original device
+                    else:
+                        raise
         elif "qwen" in self.model_name.lower():
             # Qwen: Balanced parameters for natural output
             with torch.inference_mode():
@@ -304,9 +423,7 @@ class AspectAbstractiveSummarizer:
         input_ids = model_inputs.input_ids
         new_tokens = [output[len(inp) :] for inp, output in zip(input_ids, output_ids)]
 
-        summary = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[
-            0
-        ].strip()
+        summary = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[0].strip()
 
         # Clean up any thinking process tags (especially for Qwen)
         summary = self._clean_summary(summary)
@@ -371,7 +488,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         aspect: str,
         positive_sentences: List[str],
         negative_sentences: List[str],
-        max_sentences: int = 30,
+        max_sentences: int = MAX_SENTENCES,
     ):
         if not positive_sentences and not negative_sentences:
             return None
@@ -504,7 +621,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         aspect: str,
         positive_sentences: List[str],
         negative_sentences: List[str],
-        max_sentences: int = 200,
+        max_sentences: int = MAX_SENTENCES,
     ) -> str:
         if not positive_sentences and not negative_sentences:
             return ""
@@ -572,21 +689,51 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
                     f"Summary:"
                 )
 
-        model_inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
+        model_inputs = self.tokenizer(
+            [text], 
+            return_tensors="pt", 
+            padding=True,
+            truncation=True,
+            max_length=2048
+        ).to(self.model.device)
+
+        # Clear CUDA cache before generation (helps prevent memory-related CUDA errors)
+        self._clear_cuda_cache()
 
         # Model-specific generation parameters for polarity summarization
         if "gemma" in self.model_name.lower():
-            # Gemma: Lower temperature for balanced, focused outputs
+            # Gemma: Use greedy decoding to avoid CUDA multinomial sampling errors
+            # Greedy decoding is more stable and avoids numerical instability issues
             with torch.inference_mode():
-                output_ids = self.model.generate(
-                    **model_inputs,
-                    max_new_tokens=self.max_new_tokens,
-                    do_sample=True,
-                    temperature=0.6,
-                    top_p=0.9,
-                    top_k=50,
-                    pad_token_id=self.tokenizer.eos_token_id,
-                )
+                try:
+                    output_ids = self.model.generate(
+                        input_ids=model_inputs.input_ids,
+                        attention_mask=model_inputs.attention_mask,
+                        max_new_tokens=self.max_new_tokens,
+                        do_sample=False,  # Greedy decoding - most stable for Gemma
+                        num_beams=1,
+                        pad_token_id=self.tokenizer.pad_token_id,
+                        eos_token_id=self.tokenizer.eos_token_id,
+                    )
+                except RuntimeError as e:
+                    if "CUDA" in str(e):
+                        # Fallback: try on CPU if CUDA fails
+                        print(f"CUDA error detected, attempting CPU fallback: {e}")
+                        original_device = self.device
+                        model_inputs_cpu = {k: v.cpu() for k, v in model_inputs.items()}
+                        self.model.cpu()
+                        output_ids = self.model.generate(
+                            input_ids=model_inputs_cpu["input_ids"],
+                            attention_mask=model_inputs_cpu["attention_mask"],
+                            max_new_tokens=self.max_new_tokens,
+                            do_sample=False,
+                            num_beams=1,
+                            pad_token_id=self.tokenizer.pad_token_id,
+                            eos_token_id=self.tokenizer.eos_token_id,
+                        )
+                        self.model.to(original_device)  # Move back to original device
+                    else:
+                        raise
         elif "qwen" in self.model_name.lower():
             # Qwen: Natural, flowing balanced summaries
             with torch.inference_mode():
