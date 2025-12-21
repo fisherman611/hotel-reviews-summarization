@@ -24,6 +24,7 @@ with open("methods/hybrid_extractive_abstractive/config.json", "r", encoding="ut
 RETRIEVAL_MODEL = config["retrieval_model"]
 RERANKER_MODEL = config["reranker_model"]
 K = config["k"]
+NUM_EXAMPLES = config["num_examples"]
 # Paths
 RETRIEVE_DATA_PATH = Path(config["retrieve_data_path"])
 INDEX_DIR = Path("data/retrieval_index")
@@ -204,7 +205,7 @@ class HybridRetriever:
     def retrieve(
         self,
         query_entity: Dict[str, Any],
-        top_k: int = K,
+        top_k: int = NUM_EXAMPLES,
         top_k_candidates: int = 50,
         rerank: bool = True,
         exclude_entity_ids: Optional[List[str]] = None,
@@ -327,7 +328,7 @@ class HybridRetriever:
         query_entity: Dict[str, Any],
         aspect: str,
         polarity: str = None,
-        top_k: int = 3,
+        top_k: int = NUM_EXAMPLES,
     ) -> List[RetrievedExample]:
         """
         Retrieve examples specifically relevant to a given aspect (and optionally polarity).
