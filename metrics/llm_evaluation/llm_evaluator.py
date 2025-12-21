@@ -594,6 +594,9 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
+    OUTPUT_PATH = Path(args.output)
+    os.makedirs(OUTPUT_PATH.parent, exist_ok=True)
+    
     if args.sample is not None:
         # Evaluate single sample
         with open(args.input_file, "r", encoding="utf-8") as f:
