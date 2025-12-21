@@ -21,6 +21,7 @@
     "reranker_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
     "max_new_tokens": 75,
     "max_sentences": 200,
+    "num_examples": 3,
     "data_path": "data/test.json",
     "retrieve_data_path": "data/retrieve_data.json",
     "summary_output_path": "outputs/hybrid_extractive_abstractive/hybrid_extractive_abstractive_bart_mpnet_gemma_summaries.json",
