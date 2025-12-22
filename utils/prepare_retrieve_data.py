@@ -9,9 +9,9 @@ sys.path.append(PROJECT_ROOT / "methods/hybrid_extractive_abstractive")
 sys.path.append(PROJECT_ROOT / "utils")
 import json
 
-from aspect_classifier import AspectClassifier
-from polarity_classifier import PolarityClassifier
-from aspect_polarity_sentences_selector import AspectPolaritySentencesSelector
+from methods.hybrid_extractive_abstractive.aspect_classifier import AspectClassifier
+from methods.hybrid_extractive_abstractive.polarity_classifier import PolarityClassifier
+from methods.hybrid_extractive_abstractive.aspect_polarity_sentences_selector import AspectPolaritySentencesSelector
 from utils.helpers import *
 from tqdm.auto import tqdm
 
