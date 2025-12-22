@@ -208,4 +208,4 @@ __marimo__/
 /data
 space.tar.gz
 test*
-methods/hybrid_extractive_abstractive/retrieval_bart_index
+methods/hybrid_extractive_abstractive/retrieval*
