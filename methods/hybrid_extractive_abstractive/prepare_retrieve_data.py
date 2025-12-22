@@ -23,11 +23,10 @@ ASPECT_MODEL = config["aspect_model"]
 THRESHOLD = config["threshold"]
 POLARITIES = config["polarities"]
 POLARITY_MODEL = config["polarity_model"]
-K = config["k"]
+K = 50
 SELECTOR_MODEL = config["selector_model"]
-# DATA_PATH = Path("data/space_summ_val_train.json")
-DATA_PATH = Path("data/test.json")
-OUTPUT_PATH = Path("data/retrieve_data.json")
+DATA_PATH = Path("data/space_summ_val.json")
+OUTPUT_PATH = Path(config["retrieve_data_path"])
 
 os.makedirs(OUTPUT_PATH.parent, exist_ok=True)
 
