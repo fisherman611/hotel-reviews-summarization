@@ -23,6 +23,7 @@
     "max_new_tokens":75,
     "max_sentences": 200,
     "num_examples": 3,
+    "max_length": 4096,
     "data_path": "data/test.json",
     "retrieve_data_path": "data/retrieve_bart_data.json",
     "index_dir": "methods/hybrid_extractive_abstractive/retrieval_bart_index",

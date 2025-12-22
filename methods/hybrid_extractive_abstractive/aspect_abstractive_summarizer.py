@@ -23,6 +23,7 @@ with open("methods/hybrid_extractive_abstractive/config.json", "r", encoding="ut
 ABSTRACTIVE_MODEL = config["abstractive_model"]
 MAX_NEW_TOKENS = config["max_new_tokens"]
 MAX_SENTENCES = config["max_sentences"]
+MAX_LENGTH = config["max_length"]
 K = config["k"]  # Number of sentences to show per polarity in few-shot examples
 
 class AspectAbstractiveSummarizer:
@@ -277,7 +278,7 @@ class AspectAbstractiveSummarizer:
             return_tensors="pt", 
             padding=True,
             truncation=True,
-            max_length=2048
+            max_length=MAX_LENGTH
         ).to(self.model.device)
 
         # Clear CUDA cache before generation (helps prevent memory-related CUDA errors)
@@ -609,7 +610,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
             return_tensors="pt", 
             padding=True,
             truncation=True,
-            max_length=2048
+            max_length=MAX_LENGTH
         ).to(self.model.device)
 
         # Clear CUDA cache before generation (helps prevent memory-related CUDA errors)
