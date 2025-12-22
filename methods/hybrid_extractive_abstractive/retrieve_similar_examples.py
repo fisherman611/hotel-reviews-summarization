@@ -28,7 +28,7 @@ K = config["k"]
 NUM_EXAMPLES = config["num_examples"]
 # Paths
 RETRIEVE_DATA_PATH = Path(config["retrieve_data_path"])
-INDEX_DIR = Path("data/retrieval_index")
+INDEX_DIR = Path(config["index_dir"])
 os.makedirs(INDEX_DIR, exist_ok=True)
 
 @dataclass
@@ -398,23 +398,28 @@ def format_few_shot_examples(
         pos_sentences = aspect_data.get("positive", [])
         neg_sentences = aspect_data.get("negative", [])
         
-        # Get golden summary for this aspect
+        # Get golden summaries for this aspect
         golden_summaries = example.summaries.get(aspect, [])
-        golden_summary = golden_summaries[0] if golden_summaries else ""
         
-        if not golden_summary:
-            continue  # Skip if no golden summary available
+        if not golden_summaries:
+            continue  # Skip if no golden summaries available
         
         # Format the example
         pos_block = "\n".join(f"- {s}" for s in pos_sentences[:K]) if pos_sentences else "(none)"
         neg_block = "\n".join(f"- {s}" for s in neg_sentences[:K]) if neg_sentences else "(none)"
+        
+        # Format all golden summaries
+        if len(golden_summaries) == 1:
+            summary_block = f"Golden Summary: {golden_summaries[0]}"
+        else:
+            summary_block = "Golden Summaries:\n" + "\n".join(f"- {s}" for s in golden_summaries)
         
         example_text = (
             f"Example {i+1}:\n"
             f"Hotel: {example.entity_name or example.entity_id} | Aspect: {aspect}\n\n"
             f"Positive:\n{pos_block}\n\n"
             f"Negative:\n{neg_block}\n\n"
-            f"Summary: {golden_summary}"
+            f"{summary_block}"
         )
         few_shot_parts.append(example_text)
     
@@ -427,11 +432,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Build or test retrieval index")
     parser.add_argument("--build", action="store_true", help="Build the index")
     parser.add_argument("--test", action="store_true", help="Test retrieval")
-    parser.add_argument("--retrieve-data", type=str, default=str(RETRIEVE_DATA_PATH),
+    parser.add_argument("--retrieve_data", type=str, default=str(RETRIEVE_DATA_PATH),
                        help="Path to retrieve data JSON")
-    parser.add_argument("--index-dir", type=str, default=str(INDEX_DIR),
+    parser.add_argument("--index_dir", type=str, default=str(INDEX_DIR),
                        help="Directory to save/load index")
-    parser.add_argument("--test-data", type=str, default="data/test.json",
+    parser.add_argument("--test_data", type=str, default="data/test.json",
                        help="Path to test data for testing retrieval")
     
     args = parser.parse_args()
