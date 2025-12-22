@@ -443,6 +443,14 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
             "Provide ONLY the final summary without any thinking process, explanations, or extra commentary."
         )
         
+        # Add instruction to follow examples when few-shot examples are provided
+        if few_shot_examples:
+            system_content += (
+                "\n\nIMPORTANT: You will be shown example summaries from similar hotels. "
+                "Follow the format, style, length, and writing patterns demonstrated in these examples. "
+                "Do not add any information that is not present in the provided reviews."
+            )
+        
         user_prompt = (
             f"Task: Summarize the guest reviews for the following hotel aspect.\n\n"
             f"Hotel: {entity_id}\n"
@@ -573,6 +581,8 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
                     f"Task: Create concise, balanced summaries of hotel guest feedback. "
                     f"Synthesize main points from positive and negative reviews, maintaining objectivity. "
                     f"Use natural language and focus on the most significant points.\n\n"
+                    f"IMPORTANT: Follow the format, style, length, and writing patterns demonstrated in the examples below. "
+                    f"Do not add any information that is not present in the provided reviews.\n\n"
                     f"{examples_text}"
                     f"Now summarize:\n"
                     f"Hotel: {entity_id}\n"
