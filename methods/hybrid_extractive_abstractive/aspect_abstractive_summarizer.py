@@ -10,19 +10,20 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import json
 import re
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Optional
 
 # from dotenv import load_dotenv
 # load_dotenv()
 # from huggingface_hub import login
 # login(token=os.getenv("HF_READ_TOKEN"))
 
-with open("methods/finetune_abstractive/config.json", "r", encoding="utf-8") as f:
+with open("methods/hybrid_extractive_abstractive/config.json", "r", encoding="utf-8") as f:
     config = json.load(f)
 
 ABSTRACTIVE_MODEL = config["abstractive_model"]
 MAX_NEW_TOKENS = config["max_new_tokens"]
 MAX_SENTENCES = config["max_sentences"]
+K = config["k"]  # Number of sentences to show per polarity in few-shot examples
 
 class AspectAbstractiveSummarizer:
     """
@@ -180,21 +181,29 @@ class AspectAbstractiveSummarizer:
         selected = sentences[:max_sentences]
         bullet_list = "\n".join(f"- {s}" for s in selected)
 
-        # Unified prompt for all models
+        # Detailed prompt for all models
         system_content = (
-            "You are a hotel review summarizer. Create brief, accurate summaries of guest feedback. "
-            "Provide ONLY the final summary without any thinking process or extra commentary."
+            "You are an expert hotel review summarizer. Your task is to create concise and informative summaries of guest feedback.\n\n"
+            "Guidelines:\n"
+            "1. Synthesize the main themes and key points from the reviews\n"
+            "2. Maintain objectivity and accuracy in representing guest opinions\n"
+            "3. Use natural, flowing language that sounds professional\n"
+            "4. Focus on the most frequently mentioned or significant points\n"
+            "5. Keep the summary brief (1-2 sentences) but informative\n"
+            "6. Highlight both strengths and weaknesses when present\n\n"
+            "Provide ONLY the final summary without any thinking process, explanations, or extra commentary."
         )
         
         example_user = (
-            "Summarize hotel reviews:\n\n"
+            "Task: Summarize the guest reviews for the following hotel aspect.\n\n"
             "Hotel: Grand Plaza Hotel\n"
             "Aspect: location\n"
             "Reviews:\n"
             "The hotel is conveniently located near the subway station.\n"
             "Walking distance to many restaurants and shops.\n"
             "Perfect location for exploring the city center.\n"
-            "Close to major tourist attractions."
+            "Close to major tourist attractions.\n\n"
+            "Generate a summary:"
         )
         
         example_assistant = (
@@ -203,11 +212,12 @@ class AspectAbstractiveSummarizer:
         )
         
         user_prompt = (
-            f"Summarize hotel reviews:\n\n"
+            f"Task: Summarize the guest reviews for the following hotel aspect.\n\n"
             f"Hotel: {entity_id}\n"
             f"Aspect: {aspect}\n"
             f"Reviews:\n"
-            f"{bullet_list}"
+            f"{bullet_list}\n\n"
+            f"Generate a summary:"
         )
 
         messages = [
@@ -242,17 +252,21 @@ class AspectAbstractiveSummarizer:
             selected = sentences[:max_sentences]
             bullet_list = "\n".join(f"- {s}" for s in selected)
             
-            # Unified fallback prompt for all models
+            # Detailed fallback prompt for all models
             text = (
-                f"Summarize hotel reviews:\n\n"
+                f"Task: Create concise summaries of hotel guest feedback. "
+                f"Synthesize main themes and key points from reviews, maintaining objectivity. "
+                f"Use natural language and focus on the most significant points.\n\n"
                 f"Example:\n"
-                f"Hotel: Grand Plaza | Aspect: location\n"
+                f"Hotel: Grand Plaza\n"
+                f"Aspect: location\n"
                 f"Reviews:\n"
                 f"Near subway station.\n"
                 f"Walking distance to restaurants.\n"
                 f"Great city center access.\n"
                 f"Summary: Convenient location with easy access to transportation, dining, and attractions.\n\n"
-                f"Hotel: {entity_id} | Aspect: {aspect}\n"
+                f"Hotel: {entity_id}\n"
+                f"Aspect: {aspect}\n"
                 f"Reviews:\n"
                 f"{bullet_list}\n"
                 f"Summary:"
@@ -401,6 +415,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         positive_sentences: List[str],
         negative_sentences: List[str],
         max_sentences: int = MAX_SENTENCES,
+        few_shot_examples: Optional[List[Dict[str, Any]]] = None,
     ):
         if not positive_sentences and not negative_sentences:
             return None
@@ -411,45 +426,80 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         pos_sel = positive_sentences[:half] if half else positive_sentences
         neg_sel = negative_sentences[:half] if half else negative_sentences
 
-        pos_block = "\n".join(f"- {s}" for s in pos_sel) if pos_sel else "(none)"
-        neg_block = "\n".join(f"- {s}" for s in neg_sel) if neg_sel else "(none)"
+        pos_block = "\n".join(f"{s}" for s in pos_sel) if pos_sel else "(none)"
+        neg_block = "\n".join(f"{s}" for s in neg_sel) if neg_sel else "(none)"
 
-        # Unified prompt for all models
+        # Detailed prompt for all models
         system_content = (
-            "You are a hotel review summarizer. Write brief, balanced summaries of guest feedback. "
-            "Provide ONLY the final summary without any thinking process or extra commentary."
-        )
-        
-        example_user = (
-            "Summarize hotel reviews:\n\n"
-            "Hotel: Riverside Inn | Aspect: rooms\n\n"
-            "Positive:\n"
-            "Spacious and well-decorated rooms.\n"
-            "Clean, comfortable beds.\n"
-            "Modern amenities.\n\n"
-            "Negative:\n"
-            "Noisy air conditioning.\n"
-            "Outdated bathroom fixtures."
-        )
-        
-        example_assistant = (
-            "Guests enjoy the spacious, well-decorated rooms with comfortable beds and modern amenities. "
-            "However, some noted noisy air conditioning and outdated bathroom fixtures."
+            "You are an expert hotel review summarizer. Your task is to create concise, balanced, and informative summaries of guest feedback.\n\n"
+            "Guidelines:\n"
+            "1. Synthesize the main points from both positive and negative feedback\n"
+            "2. Maintain objectivity and balance - represent both strengths and weaknesses fairly\n"
+            "3. Use natural, flowing language that sounds professional\n"
+            "4. Focus on the most frequently mentioned or significant points\n"
+            "5. Keep the summary brief (1-3 sentences) but informative\n"
+            "6. If only positive or only negative feedback exists, summarize what's available\n"
+            "7. Use connecting words (e.g., 'however', 'although', 'while') to link contrasting points\n\n"
+            "Provide ONLY the final summary without any thinking process, explanations, or extra commentary."
         )
         
         user_prompt = (
-            f"Summarize hotel reviews:\n\n"
-            f"Hotel: {entity_id} | Aspect: {aspect}\n\n"
-            f"Positive:\n{pos_block}\n\n"
-            f"Negative:\n{neg_block}"
+            f"Task: Summarize the guest reviews for the following hotel aspect.\n\n"
+            f"Hotel: {entity_id}\n"
+            f"Aspect: {aspect}\n\n"
+            f"Positive Feedback:\n{pos_block}\n\n"
+            f"Negative Feedback:\n{neg_block}\n\n"
+            f"Generate a balanced summary:"
         )
 
-        messages = [
-            {"role": "system", "content": system_content},
-            {"role": "user", "content": example_user},
-            {"role": "assistant", "content": example_assistant},
-            {"role": "user", "content": user_prompt},
-        ]
+        messages = [{"role": "system", "content": system_content}]
+        
+        # Add few-shot examples from retrieved similar hotels
+        if few_shot_examples:
+            examples_added = 0
+            for example in few_shot_examples:
+                # Get sentences for this aspect
+                aspect_data = example.get("topk_sentences", {}).get(aspect, {})
+                ex_pos_sentences = aspect_data.get("positive", [])
+                ex_neg_sentences = aspect_data.get("negative", [])
+                
+                # Get golden summaries for this aspect
+                golden_summaries = example.get("summaries", {}).get(aspect, [])
+                
+                if not golden_summaries:
+                    continue  # Skip if no golden summary available
+                
+                # Format the example
+                ex_pos_block = "\n".join(f"{s}" for s in ex_pos_sentences[:K]) if ex_pos_sentences else "(none)"
+                ex_neg_block = "\n".join(f"{s}" for s in ex_neg_sentences[:K]) if ex_neg_sentences else "(none)"
+                
+                # Format all golden summaries
+                if len(golden_summaries) == 1:
+                    summary_text = golden_summaries[0]
+                else:
+                    summary_text = "\n".join(golden_summaries)
+                
+                example_user = (
+                    f"Task: Summarize the guest reviews for the following hotel aspect.\n\n"
+                    f"Hotel: {example.get('entity_name', example.get('entity_id', 'Hotel'))}\n"
+                    f"Aspect: {aspect}\n\n"
+                    f"Positive Feedback:\n{ex_pos_block}\n\n"
+                    f"Negative Feedback:\n{ex_neg_block}\n\n"
+                    f"Generate a balanced summary:"
+                )
+                
+                messages.append({"role": "user", "content": example_user})
+                messages.append({"role": "assistant", "content": summary_text})
+                examples_added += 1
+            
+            # If no valid examples were added (all filtered out), use zero-shot
+            if examples_added == 0:
+                print(f"No valid examples found for {entity_id} - {aspect}. Using zero-shot.")
+        # If few_shot_examples is None or empty list, use zero-shot (no examples)
+        
+        # Add the actual query
+        messages.append({"role": "user", "content": user_prompt})
+        
         return messages
 
     def summarize_aspect(
@@ -459,12 +509,14 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         positive_sentences: List[str],
         negative_sentences: List[str],
         max_sentences: int = MAX_SENTENCES,
+        few_shot_examples: Optional[List[Dict[str, Any]]] = None,
     ) -> str:
         if not positive_sentences and not negative_sentences:
             return ""
 
         messages = self._build_messages(
-            entity_id, aspect, positive_sentences, negative_sentences
+            entity_id, aspect, positive_sentences, negative_sentences,
+            max_sentences=max_sentences, few_shot_examples=few_shot_examples
         )
         if messages is None:
             return ""
@@ -480,27 +532,67 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
             pos_sel = positive_sentences[:half] if positive_sentences else []
             neg_sel = negative_sentences[:half] if negative_sentences else []
 
-            pos_list = "\n".join(f"- {s}" for s in pos_sel) if pos_sel else "(none)"
-            neg_list = "\n".join(f"- {s}" for s in neg_sel) if neg_sel else "(none)"
+            pos_list = "\n".join(f"{s}" for s in pos_sel) if pos_sel else "(none)"
+            neg_list = "\n".join(f"{s}" for s in neg_sel) if neg_sel else "(none)"
 
-            # Unified fallback prompt for all models
-            text = (
-                f"Summarize hotel reviews:\n\n"
-                f"Example:\n"
-                f"Hotel: Riverside Inn | Aspect: rooms\n"
-                f"Positive:\n"
-                f"Spacious rooms.\n"
-                f"Clean beds.\n"
-                f"Modern amenities.\n"
-                f"Negative:\n"
-                f"Noisy AC.\n"
-                f"Old fixtures.\n"
-                f"Summary: Guests enjoy spacious rooms with modern amenities, but note noisy AC and old fixtures.\n\n"
-                f"Hotel: {entity_id} | Aspect: {aspect}\n"
-                f"Positive:\n{pos_list}\n"
-                f"Negative:\n{neg_list}\n"
-                f"Summary:"
-            )
+            # Build few-shot examples text
+            examples_text = ""
+            if few_shot_examples:
+                examples_added = 0
+                for i, example in enumerate(few_shot_examples):
+                    aspect_data = example.get("topk_sentences", {}).get(aspect, {})
+                    ex_pos = aspect_data.get("positive", [])[:K]
+                    ex_neg = aspect_data.get("negative", [])[:K]
+                    golden_summaries = example.get("summaries", {}).get(aspect, [])
+                    
+                    if not golden_summaries:
+                        continue
+                    
+                    ex_pos_text = "\n".join(f"{s}" for s in ex_pos) if ex_pos else "(none)"
+                    ex_neg_text = "\n".join(f"{s}" for s in ex_neg) if ex_neg else "(none)"
+                    summary_text = golden_summaries[0] if len(golden_summaries) == 1 else "\n".join(golden_summaries)
+                    
+                    examples_text += (
+                        f"Example {examples_added+1}:\n"
+                        f"Hotel: {example.get('entity_name', example.get('entity_id', 'Hotel'))}\n"
+                        f"Aspect: {aspect}\n"
+                        f"Positive Feedback:\n{ex_pos_text}\n"
+                        f"Negative Feedback:\n{ex_neg_text}\n"
+                        f"Summary: {summary_text}\n\n"
+                    )
+                    examples_added += 1
+                
+                # If no valid examples were added, use zero-shot
+                if examples_added == 0:
+                    print(f"No valid examples found for {entity_id} - {aspect}. Using zero-shot.")
+            # If few_shot_examples is None or empty, use zero-shot (no examples)
+
+            if examples_text:
+                # Few-shot format
+                text = (
+                    f"Task: Create concise, balanced summaries of hotel guest feedback. "
+                    f"Synthesize main points from positive and negative reviews, maintaining objectivity. "
+                    f"Use natural language and focus on the most significant points.\n\n"
+                    f"{examples_text}"
+                    f"Now summarize:\n"
+                    f"Hotel: {entity_id}\n"
+                    f"Aspect: {aspect}\n"
+                    f"Positive Feedback:\n{pos_list}\n"
+                    f"Negative Feedback:\n{neg_list}\n"
+                    f"Summary:"
+                )
+            else:
+                # Zero-shot format
+                text = (
+                    f"Task: Create a concise, balanced summary of hotel guest feedback. "
+                    f"Synthesize main points from both positive and negative reviews, maintaining objectivity. "
+                    f"Use natural language and focus on the most significant points.\n\n"
+                    f"Hotel: {entity_id}\n"
+                    f"Aspect: {aspect}\n"
+                    f"Positive Feedback:\n{pos_list}\n"
+                    f"Negative Feedback:\n{neg_list}\n"
+                    f"Summary:"
+                )
 
         model_inputs = self.tokenizer(
             [text], 
@@ -588,7 +680,11 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
 
         return summary
 
-    def summarize_entity(self, entity: Dict[str, Any]) -> Dict[str, Any]:
+    def summarize_entity(
+        self, 
+        entity: Dict[str, Any],
+        few_shot_examples: Optional[List[Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
         entity_id = entity["entity_id"]
         golden_summaries = entity["summaries"]
         aspect_to_polarity = entity.get("grouped_reviews", {})
@@ -604,6 +700,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
                 aspect,
                 positive_sentences=positive_sentences,
                 negative_sentences=negative_sentences,
+                few_shot_examples=few_shot_examples,
             )
             aspect_summaries[aspect] = summary
 
@@ -614,5 +711,25 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
             "golden_summaries": golden_summaries,
         }
 
-    # process() is inherited from AspectAbstractiveSummarizer and still works:
-    # def process(self, entities): return [self.summarize_entity(e) for e in entities]
+    def process(
+        self, 
+        entities: List[Dict[str, Any]],
+        entity_examples: Optional[Dict[str, List[Dict[str, Any]]]] = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Process entities with optional per-entity few-shot examples.
+        
+        Args:
+            entities: List of entities to summarize
+            entity_examples: Optional dict mapping entity_id to list of retrieved examples
+        
+        Returns:
+            List of summarized entities
+        """
+        results = []
+        for entity in entities:
+            entity_id = entity["entity_id"]
+            examples = entity_examples.get(entity_id) if entity_examples else None
+            result = self.summarize_entity(entity, few_shot_examples=examples)
+            results.append(result)
+        return results

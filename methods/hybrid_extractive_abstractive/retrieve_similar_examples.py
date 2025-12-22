@@ -57,11 +57,13 @@ class HybridRetriever:
         device: str = None,
         bm25_weight: float = 0.3,
         dense_weight: float = 0.7,
+        threshold: float = 0.5,
     ):
         self.dense_model_name = dense_model_name
         self.reranker_model_name = reranker_model_name
         self.bm25_weight = bm25_weight
         self.dense_weight = dense_weight
+        self.threshold = threshold
         
         if device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -203,6 +205,7 @@ class HybridRetriever:
         top_k_candidates: int = 50,
         rerank: bool = True,
         exclude_entity_ids: Optional[List[str]] = None,
+        threshold: Optional[float] = None,
     ) -> List[RetrievedExample]:
         """
         Retrieve similar examples for a query entity using hybrid search.
@@ -214,6 +217,8 @@ class HybridRetriever:
             top_k_candidates: Number of candidates to retrieve before reranking
             rerank: Whether to use cross-encoder reranking
             exclude_entity_ids: Entity IDs to exclude from results (e.g., the query itself)
+            threshold: Minimum hybrid score threshold for filtering during retrieval phase.
+                      If None, uses self.threshold. Applied before reranking.
         
         Returns:
             List of RetrievedExample objects sorted by relevance
@@ -253,10 +258,19 @@ class HybridRetriever:
         # Get top candidates
         candidate_indices = np.argsort(hybrid_scores)[::-1]
         
-        # Filter out excluded entities and get top_k_candidates
+        # Apply threshold
+        score_threshold = threshold if threshold is not None else self.threshold
+        
+        # Filter out excluded entities, apply threshold, and get top_k_candidates
         candidates = []
         for idx in candidate_indices:
             entity = self.retrieve_data[idx]
+            hybrid_score = float(hybrid_scores[idx])
+            
+            # Apply threshold filter
+            if hybrid_score < score_threshold:
+                continue
+            
             if entity["entity_id"] not in exclude_entity_ids:
                 candidates.append(RetrievedExample(
                     entity_id=entity["entity_id"],
@@ -265,7 +279,7 @@ class HybridRetriever:
                     summaries=entity.get("summaries", {}),
                     bm25_score=float(bm25_scores[idx]),
                     dense_score=float(dense_scores[idx]),
-                    hybrid_score=float(hybrid_scores[idx]),
+                    hybrid_score=hybrid_score,
                 ))
             if len(candidates) >= top_k_candidates:
                 break
@@ -323,13 +337,14 @@ class HybridRetriever:
         aspect: str,
         polarity: str = None,
         top_k: int = NUM_EXAMPLES,
+        threshold: Optional[float] = None,
     ) -> List[RetrievedExample]:
         """
         Retrieve examples specifically relevant to a given aspect (and optionally polarity).
         Useful for aspect-specific few-shot prompting.
         """
         # Get general retrieved examples first
-        examples = self.retrieve(query_entity, top_k=top_k * 2)
+        examples = self.retrieve(query_entity, top_k=top_k * 2, threshold=threshold)
         
         # Filter/prioritize those that have good coverage for the target aspect
         scored_examples = []
@@ -405,18 +420,18 @@ def format_few_shot_examples(
             continue  # Skip if no golden summaries available
         
         # Format the example
-        pos_block = "\n".join(f"- {s}" for s in pos_sentences[:K]) if pos_sentences else "(none)"
-        neg_block = "\n".join(f"- {s}" for s in neg_sentences[:K]) if neg_sentences else "(none)"
+        pos_block = "\n".join(f"{s}" for s in pos_sentences[:K]) if pos_sentences else "(none)"
+        neg_block = "\n".join(f"{s}" for s in neg_sentences[:K]) if neg_sentences else "(none)"
         
         # Format all golden summaries
         if len(golden_summaries) == 1:
             summary_block = f"Golden Summary: {golden_summaries[0]}"
         else:
-            summary_block = "Golden Summaries:\n" + "\n".join(f"- {s}" for s in golden_summaries)
+            summary_block = "Golden Summaries:\n" + "\n".join(f"{s}" for s in golden_summaries)
         
         example_text = (
             f"Example {i+1}:\n"
-            f"Hotel: {example.entity_name or example.entity_id} | Aspect: {aspect}\n\n"
+            f"Hotel: {example.entity_name or example.entity_id}\nAspect: {aspect}\n\n"
             f"Positive:\n{pos_block}\n\n"
             f"Negative:\n{neg_block}\n\n"
             f"{summary_block}"
