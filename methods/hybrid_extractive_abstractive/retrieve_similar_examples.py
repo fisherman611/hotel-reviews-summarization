@@ -9,7 +9,8 @@ if str(PROJECT_ROOT) not in sys.path:
 import json
 import pickle
 import numpy as np
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional
+import re
 from dataclasses import dataclass
 
 import faiss
@@ -79,7 +80,6 @@ class HybridRetriever:
         self.entity_texts: List[str] = []  # Concatenated review text per entity
         self.bm25: Optional[BM25Okapi] = None
         self.faiss_index: Optional[faiss.Index] = None
-        self.entity_embeddings: Optional[np.ndarray] = None
         
     def _get_entity_text(self, entity: Dict[str, Any]) -> str:
         """
@@ -99,8 +99,6 @@ class HybridRetriever:
     
     def _tokenize_for_bm25(self, text: str) -> List[str]:
         """Simple tokenization for BM25."""
-        # Lowercase and split on whitespace and punctuation
-        import re
         tokens = re.findall(r'\b\w+\b', text.lower())
         return tokens
     
@@ -130,7 +128,7 @@ class HybridRetriever:
         
         # Build dense embeddings and FAISS index
         print("Encoding entities for dense retrieval...")
-        self.entity_embeddings = self.dense_encoder.encode(
+        entity_embeddings = self.dense_encoder.encode(
             self.entity_texts,
             normalize_embeddings=True,
             show_progress_bar=True,
@@ -138,9 +136,9 @@ class HybridRetriever:
         )
         
         # Create FAISS index (using Inner Product for normalized embeddings = cosine similarity)
-        embedding_dim = self.entity_embeddings.shape[1]
+        embedding_dim = entity_embeddings.shape[1]
         self.faiss_index = faiss.IndexFlatIP(embedding_dim)
-        self.faiss_index.add(self.entity_embeddings.astype(np.float32))
+        self.faiss_index.add(entity_embeddings.astype(np.float32))
         
         print(f"Index built with {len(retrieve_data)} entities, embedding dim: {embedding_dim}")
         
@@ -165,8 +163,6 @@ class HybridRetriever:
         with open(index_dir / "retrieve_data.json", "w", encoding="utf-8") as f:
             json.dump(self.retrieve_data, f, ensure_ascii=False, indent=2)
         
-        np.save(index_dir / "entity_embeddings.npy", self.entity_embeddings)
-        
         print(f"Index saved to {index_dir}")
     
     def load_index(self, index_dir: Path = INDEX_DIR):
@@ -187,8 +183,6 @@ class HybridRetriever:
         
         with open(index_dir / "retrieve_data.json", "r", encoding="utf-8") as f:
             self.retrieve_data = json.load(f)
-        
-        self.entity_embeddings = np.load(index_dir / "entity_embeddings.npy")
         
         print(f"Index loaded: {len(self.retrieve_data)} entities")
     
