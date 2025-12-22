@@ -24,6 +24,7 @@
     "num_examples": 3,
     "data_path": "data/test.json",
     "retrieve_data_path": "data/retrieve_bart_data.json",
+    "index_dir": "methods/hybrid_extractive_abstractive/retrieval_bart_index",
     "summary_output_path": "outputs/hybrid_extractive_abstractive/hybrid_extractive_abstractive_bart_mpnet_gemma_summaries.json",
     "grouped_output_path": "data/hybrid_extractive_abstractive_bart_mpnet_gemma/grouped_output.json",
     "topk_output_path": "data/hybrid_extractive_abstractive_bart_mpnet_gemma/top_k_output.json",
