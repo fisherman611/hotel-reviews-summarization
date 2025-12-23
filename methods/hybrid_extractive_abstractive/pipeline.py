@@ -32,6 +32,7 @@ ABSTRACTIVE_MODEL = config["abstractive_model"]
 MAX_NEW_TOKENS = config["max_new_tokens"]
 NUM_EXAMPLES = config["num_examples"]
 RETRIEVAL_THRESHOLD = config.get("retrieval_threshold", 0.5)
+USE_RETRIEVAL = True if config["use_retrieval"] else False
 DATA_PATH = Path(config["data_path"])
 RETRIEVE_DATA_PATH = Path(config["retrieve_data_path"])
 INDEX_DIR = Path(config["index_dir"])
@@ -137,9 +138,9 @@ def run_hybrid_extractive_abstractive(
     
     topk_entities = selector.process(grouped_entities)
     
-    if topk_output_path is not None:
-        with open(topk_output_path, "w", encoding="utf-8") as f:
-            json.dump(topk_entities, f, ensure_ascii=False, indent=4)
+    # if topk_output_path is not None:
+    #     with open(topk_output_path, "w", encoding="utf-8") as f:
+    #         json.dump(topk_entities, f, ensure_ascii=False, indent=4)
     
     # ---------- Step 5: Retrieve similar examples for few-shot prompting ----------
     entity_examples: Dict[str, List[Dict[str, Any]]] = {}
@@ -204,7 +205,7 @@ def run_hybrid_extractive_abstractive(
         print("STAGE 5: ASPECT ABSTRACTIVE SUMMARIZATION (ZERO-SHOT)")
     
     final_summaries = aspect_abstractive_summarizer.process(
-        grouped_entities, 
+        topk_entities, 
         entity_examples=entity_examples if use_retrieval else None
     )
 
@@ -213,7 +214,7 @@ def run_hybrid_extractive_abstractive(
             json.dump(final_summaries, f, ensure_ascii=False, indent=4)
 
     return {
-        "grouped_entities": grouped_entities,
+        "topk_entities": topk_entities,
         "final_summaries": final_summaries,
     }
     
@@ -224,7 +225,7 @@ if __name__ == "__main__":
         summary_output_path=SUMMARY_OUTPUT_PATH,
         # aspect_threshold=THRESHOLD,
         # topk_output_path=TOPK_OUTPUT_PATH,
-        use_retrieval=True,
+        use_retrieval=USE_RETRIEVAL,
         num_examples=NUM_EXAMPLES,
         # retrieval_threshold=RETRIEVAL_THRESHOLD,  # Uses config value by default (0.5)
     )

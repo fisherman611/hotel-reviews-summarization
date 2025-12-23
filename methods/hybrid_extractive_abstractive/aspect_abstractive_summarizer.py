@@ -698,7 +698,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
     ) -> Dict[str, Any]:
         entity_id = entity["entity_id"]
         golden_summaries = entity["summaries"]
-        aspect_to_polarity = entity.get("grouped_reviews", {})
+        aspect_to_polarity = entity.get("topk_sentences", {})
 
         aspect_summaries: Dict[str, str] = {}
 
