@@ -101,10 +101,10 @@ def run_hybrid_extractive_abstractive(
     )
     print("STAGE 1: ASPECT CLASSIFICATION")
     for entity in tqdm(entities):
-        for review in tqdm(entity.get("reviews", [])):
+        for review in entity.get("reviews", []):
             sentences = review.get("sentences", [])
             sentence_aspects = []
-            for sent in tqdm(sentences):
+            for sent in sentences:
                 pred = aspect_clf.predict(sent)
                 sentence_aspects.append(pred["predicted_aspects"])
             review["sentence_aspects"] = sentence_aspects
@@ -115,10 +115,10 @@ def run_hybrid_extractive_abstractive(
     )
     print("STAGE 2: POLARITY CLASSIFICATION")
     for entity in tqdm(entities):
-        for review in tqdm(entity.get("reviews", [])):
+        for review in entity.get("reviews", []):
             sentences = review.get("sentences", [])
             sentence_polarity = []
-            for sent in tqdm(sentences):
+            for sent in sentences:
                 pred = polarity_clf.predict(sent)
                 sentence_polarity.append(pred["predicted_polarity"])
             review["sentence_polarity"] = sentence_polarity
@@ -229,5 +229,3 @@ if __name__ == "__main__":
         num_examples=NUM_EXAMPLES,
         # retrieval_threshold=RETRIEVAL_THRESHOLD,  # Uses config value by default (0.5)
     )
-    
-    print(result)
