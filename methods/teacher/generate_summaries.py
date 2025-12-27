@@ -57,35 +57,72 @@ def get_summary(reviews_text, version_index, model=None):
     if model is None:
         model = MODEL_DEFAULT
     
-    styles = [
-        "Write in a balanced and descriptive tone, like a professional travel guide.",
-        "Write in a direct and concise tone, focusing heavily on the specific pros and cons mentioned by guests.",
-        "Write in a more conversational and subjective tone, as if one guest is giving a detailed recap to another."
+    # styles = [
+    #     "Write in a balanced and descriptive tone, like a professional travel guide.",
+    #     "Write in a direct and concise tone, focusing heavily on the specific pros and cons mentioned by guests.",
+    #     "Write in a more conversational and subjective tone, as if one guest is giving a detailed recap to another."
+    # ]
+
+    focus_instructions = [
+        "Identify the single most common sentiment (Positive or Negative). Write 1-2 short, punchy sentences stating this main feeling and the primary reason for it. Ignore minor details.",
+        "Focus on physical objects and specific nouns mentioned (e.g., 'flat screen TV', 'marble floors', 'hot water', 'wifi'). List these features in a natural sentence describing the room/hotel.",
+        "State directly. Do not use softening language (e.g., 'however', 'although'). If something is bad, just say it is bad. If something is good, just say it is good."
     ]
-    style_instruction = styles[version_index % len(styles)]
+    instruction = focus_instructions[version_index % len(focus_instructions)]
 
-    prompt = f"""You are an expert hotel reviewer. Based on the following reviews for a hotel, please:
-1. Identify the Name of the Hotel.
-2. Provide a concise, human-natural summary (1-3 sentences, <100 words) for each of these 6 aspects:
-   - rooms
-   - location
-   - service
-   - cleanliness
-   - building
-   - food
+    prompt = f"""You are an expert abstractive summarizer. Your task is to write a summary of opinions for specific aspects of a hotel.
 
-{style_instruction} 
-Avoid using robotic phrases like "The hotel offers..." or "Guests noted that...". Speak naturally and vary your sentence structures.
+**CRITICAL RULES (Failure to follow these lowers the score):**
+1.  **NO META-LANGUAGE:** NEVER say "Guests said," "Reviewers mentioned," "The consensus is," or "Reports indicate."
+    * *BAD:* "Guests found the location convenient."
+    * *GOOD:* "The location is convenient."
+2.  **DIRECT ASSERTIONS:** State opinions as objective facts.
+3.  **BREVITY:** Keep it short (15-40 words), and strictly under 75 words. Do not fill the space just because you can.
+4.  **FOCUS:** {instruction}
 
-Output MUST be a valid JSON object with the following structure:
+**EXAMPLE SUMMARIES**
+```
+"rooms": [
+    "The rooms had excellent creature comforts, towels pillows and bedding . I felt that it was a very comfortable, nicely decorated, spacious sleeping room. The rooms overlooking the bay were fantastic with floor to ceiling windows with amazing views. The bathroom is also really nice, as well.",
+    "The room was very basic with some odor. It seems like it wasn't getting aired. The room was recently nicely decorated and in a style similar to most US motel rooms with two large queen sized beds, window-mounted air conditioner mounted and came with safe, refrigerator and microwave. The A/C is noisy, but works well. Otherwise, the rooms are quite. The beds are comfortable. The bedroom and bathroom were clean and comfortable.",
+    "The rooms were clean, and comfortable; which includes them being quiet. They also had an amazing view overlooking the harbor and float planes.",
+],
+"location": [
+    "This hotel has a very good location near the Biscayne Bay with beautiful views! It's very close to the Bayside area, and just a $15 ride to Lincoln Rd/South Beach. There were always taxi's at the hotel. There was a lot of construction around the hotel, but overall it was relaxing for downtown location.",
+    "It was a good location, plenty of restaurants nearby and easy access to major routes. It's very close to Super Target, Olive Garden, and Publix. It's in a good place to fuel up for the long days at the parks.",
+    "The hotel is in downtown Vancouver, with a wonderful view of the harbor from the rooms. It is also near a SkyTrain station and within walking distance of the convention center.",
+],
+"service": [
+    "The staff was always friendly, accommodating, and helpful. The valet employees are very quick and nice.",
+    "The staff are fast, friendly & provide a good service. The guest services stand was helpful. The reception staff was mostly very pleasant and helpful, except for one older woman who was abrupt and unhelpful. Otherwise, the housekeeping and ticket agents were the best!The directions given by the hotel staff were also very clear.",
+    "Very friendly and helpful staff offering local suggestions. Excellent housekeeping service that was very efficient.",
+],
+"cleanliness": [
+    "The rooms at Hilton Miami Downtown were very clean.",
+    "Everyday the rooms were cleaned and had fresh linen and towels. The grounds were also tidy.",
+    "The rooms and the hotel itself were all very clean and comfortable",
+],
+"building": [
+    "The lobby, pool, and gym of the hotel were all very beautiful.",
+    "There was a good pool. And on the ground floor nearby is a self-service laundry machine."
+    "The very obviously updated lobby, restaurant, and bar area is beautiful. Loved the decor in eclectic reds, golds, and blacks. The free WiFi in the lobby area is good. The pool, sauna, and training room were excellent, along with security. There were very nice harbor views.",
+],
+"food": [
+    "The breakfast was generally very good , although it was the same every day, and sometimes reported as cold. Complimentary coffee, fruit, and bottled water were offered once one exists the elevator in the morning into the lobby. The restaurant on the main level was excellent, had a variety of food and drinks. The breakfast buffet was expensive.",
+    "The hotels simple continental breakfast was good. However, it was sometimes hard to get a seat.",
+    "The hotel has a good quality menu. There's a breakfast buffet with lots of choices including tons of fruit. The menu changed during the day to include a wide variety of options.",
+]
+```
+
+Output MUST be a valid JSON object:
 {{
     "summaries": {{
-        "rooms": "Summary...",
-        "location": "Summary...",
-        "service": "Summary...",
-        "cleanliness": "Summary...",
-        "building": "Summary...",
-        "food": "Summary..."
+        "rooms": "...",
+        "location": "...",
+        "service": "...",
+        "cleanliness": "...",
+        "building": "...",
+        "food": "..."
     }}
 }}
 
@@ -100,8 +137,9 @@ Reviews:
         ],
         "temperature": 0.6,
         "top_p": 0.7,
-        "max_tokens": 4096,
-        "stream": False
+        "max_tokens": 8192,
+        "stream": False,
+        "reasoning_effort": "low"
     }
     
     headers = {

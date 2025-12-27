@@ -656,4 +656,4 @@ if __name__ == "__main__":
         # Evaluate all samples
         results = evaluate_output_file(args.input_file, args.output, args.summary_type, 
                                       args.temperature, args.max_tokens)
-        print(results)
+        # print(results)
