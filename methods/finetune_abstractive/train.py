@@ -16,7 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import torch
 from datasets import load_dataset
-from unsloth import FastModel
+from unsloth import FastLanguageModel
 from unsloth.chat_templates import get_chat_template, train_on_responses_only
 from trl import SFTTrainer, SFTConfig
 from transformers import TrainerCallback
@@ -32,18 +32,21 @@ MODEL_CONFIGS = {
         "chat_template": "gemma-3",
         "instruction_part": "<start_of_turn>user\n",
         "response_part": "<start_of_turn>model\n",
+        "load_in_4bit": True,
     },
     "qwen25": {
         "model_name": "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
         "chat_template": "qwen-2.5",
         "instruction_part": "<|im_start|>user\n",
         "response_part": "<|im_start|>assistant\n",
+        "load_in_4bit": True,
     },
     "llama32": {
         "model_name": "unsloth/Llama-3.2-1B-Instruct-bnb-4bit",
         "chat_template": "llama-3.2",
         "instruction_part": "<|start_header_id|>user<|end_header_id|>\n\n",
         "response_part": "<|start_header_id|>assistant<|end_header_id|>\n\n",
+        "load_in_4bit": True,
     },
 }
 
@@ -112,18 +115,21 @@ def load_and_prepare_model(
     """
     config = MODEL_CONFIGS[model_key]
     
-    print(f"Loading model: {config['model_name']}")
-    model, tokenizer = FastModel.from_pretrained(
+    # Check if model uses 4-bit quantization
+    use_4bit = config.get("load_in_4bit", True)
+    
+    print(f"Loading model: {config['model_name']} (4-bit: {use_4bit})")
+    model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=config["model_name"],
         max_seq_length=max_seq_length,
-        load_in_4bit=True,
+        load_in_4bit=use_4bit,
         load_in_8bit=False,
         full_finetuning=False,
     )
     
     # Add LoRA adapters
     print("Adding LoRA adapters...")
-    model = FastModel.get_peft_model(
+    model = FastLanguageModel.get_peft_model(
         model,
         r=lora_r,
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
@@ -206,7 +212,7 @@ def train(
     lr_scheduler_type: str = "cosine",
     optim: str = "adamw_8bit",
     seed: int = 42,
-    logging_steps: int = 10,
+    logging_steps: int = 1,
     save_strategy: str = "epoch",
     # LoRA hyperparameters
     lora_r: int = 16,

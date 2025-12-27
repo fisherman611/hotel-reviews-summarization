@@ -25,14 +25,17 @@ MODEL_CONFIGS = {
     "gemma3": {
         "base_model": "unsloth/gemma-3-270m-it-bnb-4bit",
         "chat_template": "gemma-3",
+        "load_in_4bit": True,
     },
     "qwen25": {
         "base_model": "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
         "chat_template": "qwen-2.5",
+        "load_in_4bit": True,
     },
     "llama32": {
         "base_model": "unsloth/Llama-3.2-1B-Instruct-bnb-4bit",
         "chat_template": "llama-3.2",
+        "load_in_4bit": True,
     },
 }
 
@@ -85,7 +88,7 @@ class FinetuneAbstractiveSummarizer:
             temperature: Sampling temperature
             top_p: Top-p sampling
         """
-        from unsloth import FastModel
+        from unsloth import FastLanguageModel
         from unsloth.chat_templates import get_chat_template
         
         if model_key not in MODEL_CONFIGS:
@@ -101,22 +104,25 @@ class FinetuneAbstractiveSummarizer:
         self.top_p = top_p
         self.base_only = base_only
         
+        # Get 4-bit setting from config
+        use_4bit = self.config.get("load_in_4bit", True)
+        
         # Load model
         if base_only:
             # Load base model without LoRA
-            print(f"Loading base model: {self.config['base_model']}")
-            self.model, self.tokenizer = FastModel.from_pretrained(
+            print(f"Loading base model: {self.config['base_model']} (4-bit: {use_4bit})")
+            self.model, self.tokenizer = FastLanguageModel.from_pretrained(
                 model_name=self.config['base_model'],
                 max_seq_length=20000,
-                load_in_4bit=True,
+                load_in_4bit=use_4bit,
             )
         else:
             # Load model with LoRA adapters
-            print(f"Loading finetuned model from: {lora_path}")
-            self.model, self.tokenizer = FastModel.from_pretrained(
+            print(f"Loading finetuned model from: {lora_path} (4-bit: {use_4bit})")
+            self.model, self.tokenizer = FastLanguageModel.from_pretrained(
                 model_name=lora_path,
                 max_seq_length=20000,
-                load_in_4bit=True,
+                load_in_4bit=use_4bit,
             )
         
         # Apply chat template
