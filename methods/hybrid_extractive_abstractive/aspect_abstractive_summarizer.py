@@ -433,23 +433,33 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
         # Detailed prompt for all models
         system_content = (
             "You are an expert hotel review summarizer. Your task is to create concise, balanced, and informative summaries of guest feedback.\n\n"
-            "Guidelines:\n"
-            "1. Synthesize the main points from both positive and negative feedback\n"
-            "2. Maintain objectivity and balance - represent both strengths and weaknesses fairly\n"
-            "3. Use natural, flowing language that sounds professional\n"
-            "4. Focus on the most frequently mentioned or significant points\n"
-            "5. Keep the summary brief (1-3 sentences) but informative\n"
-            "6. If only positive or only negative feedback exists, summarize what's available\n"
-            "7. Use connecting words (e.g., 'however', 'although', 'while') to link contrasting points\n\n"
+            "CRITICAL RULES - YOU MUST FOLLOW THESE:\n"
+            "1. ONLY use information explicitly stated in the provided reviews. Do NOT infer, assume, or add any details not mentioned.\n"
+            "2. Do NOT copy information from example summaries - examples are ONLY for style/format reference.\n"
+            "3. Do NOT mention specific hotels, locations, or details from examples in your summary.\n"
+            "4. Synthesize the main points from both positive and negative feedback (if both exist)\n"
+            "5. Maintain objectivity and balance - represent both strengths and weaknesses fairly\n"
+            "6. Use natural, flowing language that sounds professional\n"
+            "7. Focus on the most frequently mentioned or significant points from the provided reviews\n"
+            "8. Keep the summary brief (1-3 sentences) but informative\n"
+            "9. If only positive or only negative feedback exists, summarize what's available\n"
+            "10. Use connecting words (e.g., 'however', 'although', 'while') to link contrasting points\n\n"
             "Provide ONLY the final summary without any thinking process, explanations, or extra commentary."
         )
         
         # Add instruction to follow examples when few-shot examples are provided
         if few_shot_examples:
             system_content += (
-                "\n\nIMPORTANT: You will be shown example summaries from similar hotels. "
-                "Follow the format, style, length, and writing patterns demonstrated in these examples. "
-                "Do not add any information that is not present in the provided reviews."
+                "\n\nIMPORTANT ABOUT EXAMPLES:\n"
+                "You will see example summaries from other hotels. These examples are provided ONLY to show you:\n"
+                "- The desired writing style and tone\n"
+                "- The appropriate length and format\n"
+                "- How to structure balanced summaries\n\n"
+                "DO NOT:\n"
+                "- Copy any content, facts, or details from the examples\n"
+                "- Use information from example hotels in your summary\n"
+                "- Assume the current hotel has similar features to example hotels\n\n"
+                "Your summary must be based EXCLUSIVELY on the reviews provided for the current hotel."
             )
         
         user_prompt = (
@@ -458,6 +468,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
             f"Aspect: {aspect}\n\n"
             f"Positive Feedback:\n{pos_block}\n\n"
             f"Negative Feedback:\n{neg_block}\n\n"
+            f"CRITICAL: Base your summary ONLY on the reviews above. Do not add any information not explicitly stated in these reviews.\n\n"
             f"Generate a balanced summary:"
         )
 
@@ -489,6 +500,7 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
                     summary_text = "\n".join(golden_summaries)
                 
                 example_user = (
+                    f"[EXAMPLE - FOR STYLE REFERENCE ONLY]\n"
                     f"Task: Summarize the guest reviews for the following hotel aspect.\n\n"
                     f"Hotel: {example.get('entity_name', example.get('entity_id', 'Hotel'))}\n"
                     f"Aspect: {aspect}\n\n"
@@ -537,6 +549,37 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
             )
         else:
             # Fallback for base models without chat template (few-shot format)
+
+            system_content = (
+                "You are an expert hotel review summarizer. Your task is to create concise, balanced, and informative summaries of guest feedback.\n\n"
+                "CRITICAL RULES - YOU MUST FOLLOW THESE:\n"
+                "1. ONLY use information explicitly stated in the provided reviews. Do NOT infer, assume, or add any details not mentioned.\n"
+                "2. Do NOT copy information from example summaries - examples are ONLY for style/format reference.\n"
+                "3. Do NOT mention specific hotels, locations, or details from examples in your summary.\n"
+                "4. Synthesize the main points from both positive and negative feedback (if both exist)\n"
+                "5. Maintain objectivity and balance - represent both strengths and weaknesses fairly\n"
+                "6. Use natural, flowing language that sounds professional\n"
+                "7. Focus on the most frequently mentioned or significant points from the provided reviews\n"
+                "8. Keep the summary brief (1-3 sentences) but informative\n"
+                "9. If only positive or only negative feedback exists, summarize what's available\n"
+                "10. Use connecting words (e.g., 'however', 'although', 'while') to link contrasting points\n\n"
+                "Provide ONLY the final summary without any thinking process, explanations, or extra commentary."
+            )
+
+            if few_shot_examples:
+                system_content += (
+                    "\n\nIMPORTANT ABOUT EXAMPLES:\n"
+                    "You will see example summaries from other hotels. These examples are provided ONLY to show you:\n"
+                    "- The desired writing style and tone\n"
+                    "- The appropriate length and format\n"
+                    "- How to structure balanced summaries\n\n"
+                    "DO NOT:\n"
+                    "- Copy any content, facts, or details from the examples\n"
+                    "- Use information from example hotels in your summary\n"
+                    "- Assume the current hotel has similar features to example hotels\n\n"
+                    "Your summary must be based EXCLUSIVELY on the reviews provided for the current hotel."
+                )
+            
             half = max_sentences // 2
             pos_sel = positive_sentences[:half] if positive_sentences else []
             neg_sel = negative_sentences[:half] if negative_sentences else []
@@ -562,11 +605,13 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
                     summary_text = golden_summaries[0] if len(golden_summaries) == 1 else "\n".join(golden_summaries)
                     
                     examples_text += (
-                        f"Example {examples_added+1}:\n"
+                        f"--- EXAMPLE {examples_added+1} (STYLE REFERENCE ONLY - DO NOT COPY CONTENT) ---\n"
+                        f"Task: Summarize the guest reviews for the following hotel aspect.\n\n"
                         f"Hotel: {example.get('entity_name', example.get('entity_id', 'Hotel'))}\n"
-                        f"Aspect: {aspect}\n"
-                        f"Positive Feedback:\n{ex_pos_text}\n"
-                        f"Negative Feedback:\n{ex_neg_text}\n"
+                        f"Aspect: {aspect}\n\n"
+                        f"Positive Feedback:\n{ex_pos_text}\n\n"
+                        f"Negative Feedback:\n{ex_neg_text}\n\n"
+                        f"Generate a balanced summary:\n"
                         f"Summary: {summary_text}\n\n"
                     )
                     examples_added += 1
@@ -577,32 +622,31 @@ class AspectPolarityAbstractiveSummarizer(AspectAbstractiveSummarizer):
             # If few_shot_examples is None or empty, use zero-shot (no examples)
 
             if examples_text:
-                # Few-shot format
+                # Few-shot format - include system content at the beginning
                 text = (
-                    f"Task: Create concise, balanced summaries of hotel guest feedback. "
-                    f"Synthesize main points from positive and negative reviews, maintaining objectivity. "
-                    f"Use natural language and focus on the most significant points.\n\n"
-                    f"IMPORTANT: Follow the format, style, length, and writing patterns demonstrated in the examples below. "
-                    f"Do not add any information that is not present in the provided reviews.\n\n"
+                    f"{system_content}\n\n"
+                    f"EXAMPLES (FOR STYLE REFERENCE ONLY - DO NOT COPY CONTENT):\n\n"
                     f"{examples_text}"
-                    f"Now summarize:\n"
+                    f"--- NOW CREATE YOUR SUMMARY (USE ONLY THE REVIEWS BELOW) ---\n\n"
+                    f"Task: Summarize the guest reviews for the following hotel aspect.\n\n"
                     f"Hotel: {entity_id}\n"
-                    f"Aspect: {aspect}\n"
-                    f"Positive Feedback:\n{pos_list}\n"
-                    f"Negative Feedback:\n{neg_list}\n"
-                    f"Summary:"
+                    f"Aspect: {aspect}\n\n"
+                    f"Positive Feedback:\n{pos_list}\n\n"
+                    f"Negative Feedback:\n{neg_list}\n\n"
+                    f"CRITICAL: Base your summary ONLY on the reviews above. Do not add any information not explicitly stated in these reviews.\n\n"
+                    f"Generate a balanced summary:"
                 )
             else:
-                # Zero-shot format
+                # Zero-shot format - include system content at the beginning
                 text = (
-                    f"Task: Create a concise, balanced summary of hotel guest feedback. "
-                    f"Synthesize main points from both positive and negative reviews, maintaining objectivity. "
-                    f"Use natural language and focus on the most significant points.\n\n"
+                    f"{system_content}\n\n"
+                    f"Task: Summarize the guest reviews for the following hotel aspect.\n\n"
                     f"Hotel: {entity_id}\n"
-                    f"Aspect: {aspect}\n"
-                    f"Positive Feedback:\n{pos_list}\n"
-                    f"Negative Feedback:\n{neg_list}\n"
-                    f"Summary:"
+                    f"Aspect: {aspect}\n\n"
+                    f"Positive Feedback:\n{pos_list}\n\n"
+                    f"Negative Feedback:\n{neg_list}\n\n"
+                    f"CRITICAL: Base your summary ONLY on the reviews above. Do not add any information not explicitly stated in these reviews.\n\n"
+                    f"Generate a balanced summary:"
                 )
 
         model_inputs = self.tokenizer(
