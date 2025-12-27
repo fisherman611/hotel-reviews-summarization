@@ -1,5 +1,5 @@
 {
-    "aspects":[
+    "aspects": [
         "rooms",
         "location",
         "service",
@@ -10,7 +10,7 @@
     "aspect_model": "facebook/bart-large-mnli",
     "threshold": 0.5,
     "k": 5,
-    "data_path": "data/test.json",
+    "data_path": "data/space_summ_test.json",
     "summary_output_path": "outputs/baseline/baseline_bart_summaries.json",
     "topk_output_path": "data/baseline_bart/top_k_output.json",
     "grouped_output_path": "data/baseline_bart/grouped_output.json"

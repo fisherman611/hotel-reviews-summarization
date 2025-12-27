@@ -210,3 +210,5 @@ space.tar.gz
 test*
 methods/hybrid_extractive_abstractive/retrieval*
 data.zip
+outputs/finetune_models
+unsloth_compiled_cache

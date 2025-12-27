@@ -1,244 +1,254 @@
+"""
+Aspect-based summarizer for finetuned models.
+Uses Unsloth to load LoRA adapters and generate summaries.
+"""
 import os
 import sys
 from pathlib import Path
+from typing import Any, List, Dict, Optional
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
 import json
-from typing import Any, List, Dict
 
+# Import prompt formatting from prepare_data
 from methods.finetune_abstractive.prepare_data import (
-    INSTRUCTION_TEMPLATES,
-    format_instruction,
+    SYSTEM_PROMPT,
+    ASPECTS,
 )
 
-with open("methods/finetune_abstractive/config.json", "r", encoding="utf-8") as f:
-    config = json.load(f)
+# Model configurations
+MODEL_CONFIGS = {
+    "gemma3": {
+        "base_model": "unsloth/gemma-3-270m-it-bnb-4bit",
+        "chat_template": "gemma-3",
+    },
+    "qwen25": {
+        "base_model": "unsloth/Qwen2.5-0.5B-Instruct-bnb-4bit",
+        "chat_template": "qwen-2.5",
+    },
+    "llama32": {
+        "base_model": "unsloth/Llama-3.2-1B-Instruct-bnb-4bit",
+        "chat_template": "llama-3.2",
+    },
+}
 
-ABSTRACTIVE_MODEL = config["abstractive_model"]
-MAX_NEW_TOKENS = config["max_new_tokens"]
+
+def format_reviews_as_text(reviews: List[Dict[str, Any]]) -> str:
+    """Format reviews as text paragraphs."""
+    paragraphs = []
+    for review in reviews:
+        sentences = review.get("sentences", [])
+        if sentences:
+            paragraph = " ".join(sentences)
+            paragraphs.append(f"- {paragraph}")
+    return "\n".join(paragraphs)
 
 
-class AspectAbstractiveSummarizer:
+def create_instruction(aspect: str, reviews_text: str) -> str:
+    """Create the instruction/prompt for a specific aspect."""
+    instruction = f"""Summarize the **{aspect}** aspect from the following hotel reviews.
+
+Reviews:
+{reviews_text}
+
+Write a concise summary (15-40 words, strictly under 75 words) focusing only on {aspect}."""
+    return instruction
+
+
+class FinetuneAbstractiveSummarizer:
     """
-    Abstractive aspect summarizer using instruction-tuned causal LLM.
-    Following FLAN approach: natural language instructions for zero-shot/finetuned inference.
-
-    This class uses a finetuned model and does NOT require aspect classification.
-    Reviews are directly summarized for each aspect using instruction prompts.
+    Summarizer using finetuned LoRA models loaded with Unsloth.
+    Generates aspect-based summaries for hotel reviews.
     """
 
     def __init__(
         self,
-        model_name: str = ABSTRACTIVE_MODEL,
-        max_new_tokens: int = MAX_NEW_TOKENS,
-        template_index: int = 0,
+        model_key: str,
+        lora_path: str = None,
+        base_only: bool = False,
+        max_new_tokens: int = 256,
+        temperature: float = 0.7,
+        top_p: float = 0.9,
     ):
         """
+        Initialize the summarizer with a finetuned model.
+        
         Args:
-            model_name: Path or name of the finetuned model
+            model_key: One of "gemma3", "qwen25", "llama32"
+            lora_path: Path to the LoRA adapter directory (optional if base_only=True)
+            base_only: If True, use base model without LoRA adapters (zero-shot)
             max_new_tokens: Maximum tokens to generate
-            template_index: Which instruction template to use (0-9)
+            temperature: Sampling temperature
+            top_p: Top-p sampling
         """
-        self.model_name = model_name
+        from unsloth import FastModel
+        from unsloth.chat_templates import get_chat_template
+        
+        if model_key not in MODEL_CONFIGS:
+            raise ValueError(f"Unknown model_key: {model_key}. Choose from: {list(MODEL_CONFIGS.keys())}")
+        
+        if not base_only and lora_path is None:
+            raise ValueError("lora_path is required when base_only=False")
+        
+        self.model_key = model_key
+        self.config = MODEL_CONFIGS[model_key]
         self.max_new_tokens = max_new_tokens
-        self.template_index = template_index
-
-        # Load tokenizer + chat causal LM
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype="auto", device_map="auto"
+        self.temperature = temperature
+        self.top_p = top_p
+        self.base_only = base_only
+        
+        # Load model
+        if base_only:
+            # Load base model without LoRA
+            print(f"Loading base model: {self.config['base_model']}")
+            self.model, self.tokenizer = FastModel.from_pretrained(
+                model_name=self.config['base_model'],
+                max_seq_length=20000,
+                load_in_4bit=True,
+            )
+        else:
+            # Load model with LoRA adapters
+            print(f"Loading finetuned model from: {lora_path}")
+            self.model, self.tokenizer = FastModel.from_pretrained(
+                model_name=lora_path,
+                max_seq_length=20000,
+                load_in_4bit=True,
+            )
+        
+        # Apply chat template
+        print(f"Applying chat template: {self.config['chat_template']}")
+        self.tokenizer = get_chat_template(
+            self.tokenizer,
+            chat_template=self.config["chat_template"],
         )
+        
+        # Set to eval mode
+        self.model.eval()
+        print("Model loaded successfully!")
 
-    def _chunk_reviews(
-        self, reviews: List[Dict[str, Any]], chunk_size: int = 30
-    ) -> List[str]:
-        """
-        Split reviews into chunks of sentences.
-        Each chunk contains up to chunk_size sentences formatted as bullet list.
+    def _create_messages(self, aspect: str, reviews_text: str) -> List[Dict[str, str]]:
+        """Create chat messages for the model."""
+        instruction = create_instruction(aspect, reviews_text)
+        
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": instruction},
+        ]
+        return messages
 
-        Args:
-            reviews: List of review dicts with sentences
-            chunk_size: Number of sentences per chunk
-
-        Returns:
-            List of formatted text chunks
-        """
-        all_sentences = []
-        for review in reviews:
-            sentences = review.get("sentences", [])
-            all_sentences.extend(sentences)
-
-        # Split into chunks
-        chunks = []
-        for i in range(0, len(all_sentences), chunk_size):
-            chunk_sentences = all_sentences[i : i + chunk_size]
-            bullet_list = "\n".join(f"- {s}" for s in chunk_sentences)
-            chunks.append(bullet_list)
-
-        return chunks if chunks else [""]
-
-    def _build_prompt(
-        self,
-        entity_name: str,
-        aspect: str,
-        reviews_text: str,
-    ):
-        """
-        Build prompt following FLAN instruction tuning approach.
-
-        Args:
-            entity_name: Name of the hotel
-            aspect: Aspect to summarize (rooms, location, service, etc.)
-            reviews_text: Formatted review text (one chunk)
-        """
-        if not reviews_text:
-            return None
-
-        template = INSTRUCTION_TEMPLATES[self.template_index]
-        formatted_reviews = f"Hotel: {entity_name}\n\n{reviews_text}"
-        prompt = format_instruction(template, aspect, formatted_reviews)
-
-        return prompt
-
-    def _generate_from_prompt(self, prompt: str) -> str:
-        """
-        Generate text from a prompt string.
-
-        Args:
-            prompt: The prompt string to generate from
-
-        Returns:
-            Generated text
-        """
-        # Convert prompt to model inputs
-        model_inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
-
-        # Generate continuation (the summary)
-        output_ids = self.model.generate(
-            **model_inputs, max_new_tokens=self.max_new_tokens
+    def _generate(self, messages: List[Dict[str, str]]) -> str:
+        """Generate response from messages."""
+        # Apply chat template
+        prompt = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
         )
-
-        # Extract only new tokens after the prompt
-        input_ids = model_inputs.input_ids
-        new_tokens = [output[len(inp) :] for inp, output in zip(input_ids, output_ids)]
-
-        result = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[
-            0
-        ].strip()
-
-        return result
+        
+        # Tokenize
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        
+        # Generate
+        with torch.no_grad():
+            output_ids = self.model.generate(
+                **inputs,
+                max_new_tokens=self.max_new_tokens,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                do_sample=True,
+                pad_token_id=self.tokenizer.eos_token_id,
+            )
+        
+        # Extract only new tokens
+        input_length = inputs.input_ids.shape[1]
+        new_tokens = output_ids[0][input_length:]
+        
+        # Decode
+        response = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+        
+        return response
 
     def summarize_aspect(
         self,
-        entity_name: str,
         aspect: str,
         reviews: List[Dict[str, Any]],
     ) -> str:
         """
-        Generate summary for a specific aspect using instruction prompt.
-        Uses chunking to handle long review lists.
-
+        Generate summary for a specific aspect.
+        
         Args:
-            entity_name: Name of the hotel
-            aspect: Aspect to summarize
-            reviews: List of review objects (original format from data)
-
+            aspect: Aspect to summarize (rooms, location, etc.)
+            reviews: List of review objects
+            
         Returns:
-            Generated summary text
+            Generated summary string
         """
         if not reviews:
             return ""
-
-        # Chunk reviews
-        review_chunks = self._chunk_reviews(reviews)
-
-        # Generate summary for each chunk
-        chunk_summaries = []
-        for reviews_text in review_chunks:
-            prompt = self._build_prompt(entity_name, aspect, reviews_text)
-            if prompt is None:
-                continue
-
-            chunk_summary = self._generate_from_prompt(prompt)
-            if chunk_summary:
-                chunk_summaries.append(chunk_summary)
-
-        # If only one chunk, return directly
-        if len(chunk_summaries) == 1:
-            return chunk_summaries[0]
-
-        # If multiple chunks, merge them using the model
-        if len(chunk_summaries) > 1:
-            merge_prompt = (
-                f"Combine the following summaries about {aspect} for {entity_name} "
-                f"into a single coherent summary. Remove redundancy and maintain key points:\n\n"
-            )
-            for i, summary in enumerate(chunk_summaries, 1):
-                merge_prompt += f"Summary {i}: {summary}\n\n"
-
-            final_summary = self._generate_from_prompt(merge_prompt.strip())
-            return final_summary
-
-        return ""
+        
+        reviews_text = format_reviews_as_text(reviews)
+        messages = self._create_messages(aspect, reviews_text)
+        
+        return self._generate(messages)
 
     def summarize_entity(
-        self, entity: Dict[str, Any], aspects: List[str] = None
+        self,
+        entity: Dict[str, Any],
+        aspects: List[str] = None,
     ) -> Dict[str, Any]:
         """
         Generate summaries for all aspects of an entity.
-
+        
         Args:
-            entity: Entity data with reviews (original format)
-            aspects: List of aspects to summarize (default: all)
-
+            entity: Entity data with reviews
+            aspects: List of aspects to summarize (default: all 6)
+            
         Returns:
-            Dictionary with entity_id and aspect_summaries
+            Dict with entity_id, reviews, generated_summaries, golden_summaries
         """
         if aspects is None:
-            aspects = [
-                "rooms",
-                "location",
-                "service",
-                "cleanliness",
-                "building",
-                "food",
-            ]
-
+            aspects = ASPECTS
+        
         entity_id = entity.get("entity_id", "")
-        entity_name = entity.get("entity_name", "")
-        golden_summaries = entity.get("summaries", {})
         reviews = entity.get("reviews", [])
-
-        aspect_summaries: Dict[str, str] = {}
-
+        golden_summaries = entity.get("summaries", {})
+        
+        generated_summaries = {}
         for aspect in aspects:
-            summary = self.summarize_aspect(entity_name, aspect, reviews)
-            aspect_summaries[aspect] = summary
-
+            summary = self.summarize_aspect(aspect, reviews)
+            generated_summaries[aspect] = summary
+        
         return {
             "entity_id": entity_id,
-            "entity_name": entity_name,
-            "generated_summaries": aspect_summaries,
-            "golden_summaries": golden_summaries
+            "reviews": reviews,
+            "generated_summaries": generated_summaries,
+            "golden_summaries": golden_summaries,
         }
 
     def process(
-        self, entities: List[Dict[str, Any]], aspects: List[str] = None
+        self,
+        entities: List[Dict[str, Any]],
+        aspects: List[str] = None,
     ) -> List[Dict[str, Any]]:
         """
         Process multiple entities.
-
+        
         Args:
             entities: List of entity data
             aspects: List of aspects to summarize
-
+            
         Returns:
-            List of results with summaries
+            List of results with generated summaries
         """
-        return [self.summarize_entity(e, aspects) for e in entities]
+        from tqdm.auto import tqdm
+        
+        results = []
+        for entity in tqdm(entities, desc="Generating summaries"):
+            result = self.summarize_entity(entity, aspects)
+            results.append(result)
+        
+        return results

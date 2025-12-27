@@ -1,284 +1,351 @@
 """
-Prepare data for instruction tuning following FLAN approach.
-Converts hotel review data into instruction-answer pairs for finetuning.
+Prepare data for finetuning aspect-based hotel review summarization models.
+Creates 3 data recipes and converts to chat format (JSONL) for Unsloth training.
+
+Data Recipes:
+- Recipe 1: 100 Synthetic Only
+- Recipe 2: 25 Human Only  
+- Recipe 3: 75 Synth + 25 Human
+
+Chat Templates Supported:
+- gemma-3, gemma3
+- qwen-2.5, qwen2.5, qwen25
+- llama-3.2, llama-32
 """
-import os
 import json
+import os
 import sys
+import random
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-parent_dir = "data/finetune_abstractive"
-os.makedirs(parent_dir, exist_ok=True)
+# Paths
+DATA_DIR = PROJECT_ROOT / "data"
+RECIPES_DIR = DATA_DIR / "recipes"
+TRAIN_DATA_PATH = DATA_DIR / "space_summ_train.json"  # 500 Synthetic
+VAL_DATA_PATH = DATA_DIR / "space_summ_val.json"      # 25 Human
 
-# Instruction templates following FLAN approach
-# Use {aspect} and {reviews} placeholders for flexibility
-INSTRUCTION_TEMPLATES = [
-    "Summarize the {aspect}-related feedback from these hotel reviews:\n\n{reviews}",
-    "Write a summary about {aspect} based on these hotel reviews:\n\n{reviews}",
-    "{reviews}\n\nWhat do guests say about {aspect}?",
-    "{reviews}\n\nSummarize the main points about {aspect} from the above reviews.",
-    "These are hotel reviews:\n\n{reviews}\n\nWrite a brief summary focusing on {aspect}.",
-    "Based on the following reviews, summarize guest opinions about {aspect}:\n\n{reviews}",
-    "Please answer: What are guests saying about {aspect} in these reviews?\n\n{reviews}",
-    "{reviews}\n\nQuestion: What is the overall guest feedback about {aspect}?",
-    "Read these hotel reviews and summarize the {aspect}-related comments:\n\n{reviews}",
-    "Hotel reviews:\n{reviews}\n\nProvide a summary of guest experiences regarding {aspect}.",
-]
+ASPECTS = ["rooms", "location", "service", "cleanliness", "building", "food"]
+
+# Chat template markers for train_on_responses_only
+CHAT_TEMPLATE_MARKERS = {
+    "gemma-3": {
+        "instruction_part": "<start_of_turn>user\n",
+        "response_part": "<start_of_turn>model\n",
+    },
+    "gemma3": {
+        "instruction_part": "<start_of_turn>user\n",
+        "response_part": "<start_of_turn>model\n",
+    },
+    "qwen-2.5": {
+        "instruction_part": "<|im_start|>user\n",
+        "response_part": "<|im_start|>assistant\n",
+    },
+    "qwen2.5": {
+        "instruction_part": "<|im_start|>user\n",
+        "response_part": "<|im_start|>assistant\n",
+    },
+    "qwen25": {
+        "instruction_part": "<|im_start|>user\n",
+        "response_part": "<|im_start|>assistant\n",
+    },
+    "llama-3.2": {
+        "instruction_part": "<|start_header_id|>user<|end_header_id|>\n\n",
+        "response_part": "<|start_header_id|>assistant<|end_header_id|>\n\n",
+    },
+    "llama-32": {
+        "instruction_part": "<|start_header_id|>user<|end_header_id|>\n\n",
+        "response_part": "<|start_header_id|>assistant<|end_header_id|>\n\n",
+    },
+}
+
+# System prompt for the summarization task
+SYSTEM_PROMPT = """You are an expert abstractive summarizer. Your task is to write a summary of opinions for a specific aspect of a hotel.
+
+**CRITICAL RULES:**
+1. **NO META-LANGUAGE:** NEVER say "Guests said," "Reviewers mentioned," "The consensus is," or "Reports indicate."
+   - BAD: "Guests found the location convenient."
+   - GOOD: "The location is convenient."
+2. **DIRECT ASSERTIONS:** State opinions as objective facts.
+3. **BREVITY:** Keep it short (15-40 words), strictly under 75 words.
+4. **FOCUS:** Identify the main sentiment and primary reasons for it."""
 
 
-def format_instruction(template: str, aspect: str, reviews: str) -> str:
+def format_reviews_as_text(reviews: List[Dict[str, Any]]) -> str:
     """
-    Format an instruction template with aspect and reviews.
-    
-    Args:
-        template: Template string with {aspect} and {reviews} placeholders
-        aspect: The aspect to summarize (e.g., "rooms", "location")
-        reviews: The formatted review text
-    
-    Returns:
-        Formatted instruction string
+    Format reviews as text paragraphs.
+    Each review's sentences are joined into a paragraph.
     """
-    
-    return template.replace("{aspect}", aspect).replace("{reviews}", reviews)
-
-
-def chunk_reviews(reviews: List[Dict[str, Any]], chunk_size: int = 10) -> List[str]:
-    """
-    Split reviews into chunks of sentences.
-    Each chunk contains up to chunk_size sentences formatted as bullet list.
-    
-    Args:
-        reviews: List of review dicts with sentences
-        chunk_size: Number of sentences per chunk
-    
-    Returns:
-        List of formatted text chunks
-    """
-    all_sentences = []
+    paragraphs = []
     for review in reviews:
         sentences = review.get("sentences", [])
-        all_sentences.extend(sentences)
-    
-    # Split into chunks
-    chunks = []
-    for i in range(0, len(all_sentences), chunk_size):
-        chunk_sentences = all_sentences[i:i + chunk_size]
-        bullet_list = "\n".join(f"- {s}" for s in chunk_sentences)
-        chunks.append(bullet_list)
-    
-    return chunks if chunks else [""]
+        if sentences:
+            paragraph = " ".join(sentences)
+            paragraphs.append(f"- {paragraph}")
+    return "\n".join(paragraphs)
 
 
-def prepare_finetuning_dataset(
-    input_path: str,
-    output_path: str,
-    aspects: List[str] = None,
-    use_all_templates: bool = True,
-    template_index: int = 0,
-) -> List[Dict[str, Any]]:
+def create_instruction(aspect: str, reviews_text: str) -> str:
     """
-    Prepare dataset for instruction tuning.
-    
-    Args:
-        input_path: Path to input JSON file (e.g., test.json, train.json)
-        output_path: Path to output JSONL file for finetuning
-        aspects: List of aspects to include (default: all)
-        use_all_templates: If True, create examples with all 10 templates
-        template_index: If use_all_templates=False, which template to use (0-9)
+    Create the instruction/prompt for a specific aspect.
+    """
+    instruction = f"""Summarize the **{aspect}** aspect from the following hotel reviews.
+
+Reviews:
+{reviews_text}
+
+Write a concise summary (15-40 words, strictly under 75 words) focusing only on {aspect}."""
+    return instruction
+
+
+def create_conversation(
+    aspect: str,
+    reviews: List[Dict[str, Any]],
+    summary: str,
+    include_system: bool = True,
+) -> List[Dict[str, str]]:
+    """
+    Create a conversation in chat format.
     
     Returns:
-        List of training examples
+        List of message dicts with 'role' and 'content' keys.
     """
-    if aspects is None:
-        aspects = ["rooms", "location", "service", "cleanliness", "building", "food"]
+    reviews_text = format_reviews_as_text(reviews)
+    instruction = create_instruction(aspect, reviews_text)
     
-    # Load data
-    with open(input_path, "r", encoding="utf-8") as f:
-        entities = json.load(f)
+    messages = []
+    if include_system:
+        messages.append({"role": "system", "content": SYSTEM_PROMPT})
+    messages.append({"role": "user", "content": instruction})
+    messages.append({"role": "assistant", "content": summary})
     
-    training_examples = []
+    return messages
+
+
+def load_data(path: Path) -> List[Dict[str, Any]]:
+    """Load JSON data from file."""
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def create_recipes(
+    synth_data: List[Dict[str, Any]],
+    human_data: List[Dict[str, Any]],
+    seed: int = 42,
+) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Create 3 data recipes.
     
-    for entity in entities:
-        entity_id = entity.get("entity_id", "")
-        entity_name = entity.get("entity_name", "")
-        reviews = entity.get("reviews", [])
-        golden_summaries = entity.get("summaries", {})
+    Returns:
+        Dict with recipe names as keys and data lists as values.
+    """
+    random.seed(seed)
+    
+    recipes = {}
+    
+    # Recipe 1: 100 Synthetic Only
+    recipes["synth_100"] = random.sample(synth_data, min(100, len(synth_data)))
+    
+    # Recipe 2: 25 Human Only (all human data)
+    recipes["human_25"] = human_data.copy()
+    
+    # Recipe 3: 75 Synth + 25 Human
+    synth_sampled = random.sample(synth_data, min(75, len(synth_data)))
+    recipes["mixed"] = synth_sampled + human_data.copy()
+    
+    return recipes
+
+
+def convert_to_chat_jsonl(
+    data: List[Dict[str, Any]],
+    output_path: Path,
+    include_system: bool = True,
+) -> int:
+    """
+    Convert data to chat format JSONL.
+    
+    Each entity generates multiple training examples:
+    - For each aspect × each summary variant (up to 3 per aspect)
+    
+    Args:
+        data: List of entities with reviews and summaries
+        output_path: Path to output JSONL file
+        include_system: Whether to include system message
         
-        if not reviews:
-            continue
-        
-        # Chunk reviews instead of truncating
-        review_chunks = chunk_reviews(reviews)
-        
-        # Create training examples for each aspect
-        for aspect in aspects:
-            # Get gold summaries for this aspect
-            aspect_summaries = golden_summaries.get(aspect, [])
+    Returns:
+        Number of examples created
+    """
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    example_count = 0
+    
+    with open(output_path, "w", encoding="utf-8") as f:
+        for entity in data:
+            reviews = entity.get("reviews", [])
+            summaries = entity.get("summaries", {})
+            entity_id = entity.get("entity_id", "")
             
-            if not aspect_summaries:
+            if not reviews or not summaries:
                 continue
             
-            # Use all gold summaries as targets
-            for summary_idx, target_summary in enumerate(aspect_summaries):
-                # Create examples for each chunk
-                # Note: All chunks use the same target summary (the complete gold summary)
-                # The model learns to generate aspect summaries from partial review data
-                for chunk_idx, reviews_text in enumerate(review_chunks):
-                    # Format reviews with hotel name
-                    formatted_reviews = f"Hotel: {entity_name}\n\n{reviews_text}"
+            for aspect in ASPECTS:
+                aspect_summaries = summaries.get(aspect, [])
+                if not aspect_summaries:
+                    continue
+                
+                # Handle both list and string formats
+                if isinstance(aspect_summaries, str):
+                    aspect_summaries = [aspect_summaries]
+                
+                for summary_idx, summary in enumerate(aspect_summaries):
+                    if not summary or not summary.strip():
+                        continue
                     
-                    if use_all_templates:
-                        # Create one example per template
-                        for template in INSTRUCTION_TEMPLATES:
-                            instruction = format_instruction(template, aspect, formatted_reviews)
-                            
-                            example = {
-                                "entity_id": entity_id,
-                                "entity_name": entity_name,
-                                "aspect": aspect,
-                                "summary_idx": summary_idx,
-                                "chunk_idx": chunk_idx,
-                                "total_chunks": len(review_chunks),
-                                "instruction": instruction,
-                                "output": target_summary
-                            }
-                            training_examples.append(example)
-                    else:
-                        # Use only one template
-                        template = INSTRUCTION_TEMPLATES[template_index]
-                        instruction = format_instruction(template, aspect, formatted_reviews)
-                        
-                        example = {
+                    conversation = create_conversation(
+                        aspect=aspect,
+                        reviews=reviews,
+                        summary=summary.strip(),
+                        include_system=include_system,
+                    )
+                    
+                    example = {
+                        "conversations": conversation,
+                        "metadata": {
                             "entity_id": entity_id,
-                            "entity_name": entity_name,
                             "aspect": aspect,
                             "summary_idx": summary_idx,
-                            "chunk_idx": chunk_idx,
-                            "total_chunks": len(review_chunks),
-                            "instruction": instruction,
-                            "output": target_summary
                         }
-                        training_examples.append(example)
+                    }
+                    
+                    f.write(json.dumps(example, ensure_ascii=False) + "\n")
+                    example_count += 1
     
-    # Save to JSONL format (common for finetuning)
-    with open(output_path, "w", encoding="utf-8") as f:
-        for example in training_examples:
-            f.write(json.dumps(example, ensure_ascii=False) + "\n")
-    
-    print(f"Created {len(training_examples)} training examples")
-    print(f"Saved to: {output_path}")
-    
-    return training_examples
+    return example_count
 
 
-def prepare_inference_dataset(
-    input_path: str,
-    output_path: str,
-    aspects: List[str] = None,
-    template_index: int = 0,
-) -> List[Dict[str, Any]]:
+def prepare_all_recipes(
+    train_path: Path = TRAIN_DATA_PATH,
+    val_path: Path = VAL_DATA_PATH,
+    output_dir: Path = RECIPES_DIR,
+    include_system: bool = True,
+    seed: int = 42,
+) -> Dict[str, Dict[str, Any]]:
     """
-    Prepare dataset for inference (no gold summaries needed).
-    
-    Args:
-        input_path: Path to input JSON file
-        output_path: Path to output JSON file
-        aspects: List of aspects to include
-        template_index: Which template to use (0-9)
+    Prepare all 3 data recipes and save as JSONL.
     
     Returns:
-        List of inference examples
+        Dict with recipe info including paths and example counts.
     """
-    if aspects is None:
-        aspects = ["rooms", "location", "service", "cleanliness", "building", "food"]
+    print("Loading source data...")
+    synth_data = load_data(train_path)
+    human_data = load_data(val_path)
     
-    # Load data
-    with open(input_path, "r", encoding="utf-8") as f:
-        entities = json.load(f)
+    print(f"  Synthetic samples: {len(synth_data)}")
+    print(f"  Human samples: {len(human_data)}")
     
-    inference_examples = []
+    # Create recipes
+    print("\nCreating data recipes...")
+    recipes = create_recipes(synth_data, human_data, seed=seed)
     
-    for entity in entities:
-        entity_id = entity.get("entity_id", "")
-        entity_name = entity.get("entity_name", "")
-        golden_summaries = entity.get("summaries", {})
-        reviews = entity.get("reviews", [])
+    # Convert to JSONL
+    results = {}
+    for recipe_name, data in recipes.items():
+        output_path = output_dir / f"{recipe_name}.jsonl"
+        print(f"\nProcessing recipe: {recipe_name}")
+        print(f"  Entities: {len(data)}")
         
-        # Skip if no reviews
-        if not reviews:
-            continue
+        count = convert_to_chat_jsonl(
+            data=data,
+            output_path=output_path,
+            include_system=include_system,
+        )
         
-        # Chunk reviews instead of truncating
-        review_chunks = chunk_reviews(reviews)
+        print(f"  Training examples: {count}")
+        print(f"  Output: {output_path}")
         
-        entity_data = {
-            "entity_id": entity_id,
-            "entity_name": entity_name,
-            "total_chunks": len(review_chunks),
-            "aspects": {},
-            "summaries": golden_summaries
+        results[recipe_name] = {
+            "path": str(output_path),
+            "entities": len(data),
+            "examples": count,
         }
+    
+    # Save recipe metadata
+    metadata_path = output_dir / "recipes_metadata.json"
+    with open(metadata_path, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2)
+    print(f"\nMetadata saved to: {metadata_path}")
+    
+    return results
+
+
+def get_chat_template_markers(template_name: str) -> Dict[str, str]:
+    """
+    Get the instruction/response markers for a given chat template.
+    Used with Unsloth's train_on_responses_only.
+    
+    Args:
+        template_name: One of gemma-3, gemma3, qwen-2.5, qwen2.5, qwen25, llama-3.2, llama-32
         
-        # Create prompts for each aspect
-        for aspect in aspects:
-            template = INSTRUCTION_TEMPLATES[template_index]
-            
-            # Create instruction for each chunk
-            chunk_data = []
-            for chunk_idx, reviews_text in enumerate(review_chunks):
-                # Format reviews with hotel name
-                formatted_reviews = f"Hotel: {entity_name}\n\n{reviews_text}"
-                
-                instruction = format_instruction(template, aspect, formatted_reviews)
-                
-                chunk_data.append({
-                    "chunk_idx": chunk_idx,
-                    "instruction": instruction
-                })
-            
-            entity_data["aspects"][aspect] = chunk_data
-        
-        inference_examples.append(entity_data)
-    
-    # Save to JSON
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(inference_examples, f, ensure_ascii=False, indent=2)
-    
-    print(f"Created inference data for {len(inference_examples)} entities")
-    print(f"Saved to: {output_path}")
-    
-    return inference_examples
+    Returns:
+        Dict with 'instruction_part' and 'response_part' keys
+    """
+    template_name = template_name.lower()
+    if template_name not in CHAT_TEMPLATE_MARKERS:
+        available = list(CHAT_TEMPLATE_MARKERS.keys())
+        raise ValueError(f"Unknown template: {template_name}. Available: {available}")
+    return CHAT_TEMPLATE_MARKERS[template_name]
 
 
 if __name__ == "__main__":
-    # Example usage
+    import argparse
     
-    # Prepare training data with all templates (for diversity as in FLAN)
-    print("Preparing training data with multiple templates...")
-    prepare_finetuning_dataset(
-        input_path="data/space_train.json",
-        output_path="data/finetune_abstractive/finetuning_train_all_templates.jsonl",
-        use_all_templates=True
+    parser = argparse.ArgumentParser(description="Prepare finetuning data recipes")
+    parser.add_argument(
+        "--train-path",
+        type=str,
+        default=str(TRAIN_DATA_PATH),
+        help="Path to synthetic training data",
+    )
+    parser.add_argument(
+        "--val-path",
+        type=str,
+        default=str(VAL_DATA_PATH),
+        help="Path to human validation data",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=str(RECIPES_DIR),
+        help="Output directory for recipes",
+    )
+    parser.add_argument(
+        "--no-system",
+        action="store_true",
+        help="Exclude system message from conversations",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Random seed for sampling",
     )
     
-    # Prepare training data with single template (simpler)
-    print("\nPreparing training data with single template...")
-    prepare_finetuning_dataset(
-        input_path="data/space_train.json",
-        output_path="data/finetune_abstractive/finetuning_train_single_template.jsonl",
-        use_all_templates=False,
-        template_index=0
+    args = parser.parse_args()
+    
+    results = prepare_all_recipes(
+        train_path=Path(args.train_path),
+        val_path=Path(args.val_path),
+        output_dir=Path(args.output_dir),
+        include_system=not args.no_system,
+        seed=args.seed,
     )
     
-    # Prepare inference data
-    print("\nPreparing inference data...")
-    prepare_inference_dataset(
-        input_path="data/test.json",
-        output_path="data/finetune_abstractive/inference_test.json",
-        template_index=0
-    )
+    print("\n" + "="*50)
+    print("Summary:")
+    print("="*50)
+    for recipe, info in results.items():
+        print(f"  {recipe}: {info['examples']} examples from {info['entities']} entities")

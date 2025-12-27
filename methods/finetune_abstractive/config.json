@@ -1,5 +1,5 @@
 {
-    "aspects":[
+    "aspects": [
         "rooms",
         "location",
         "service",
@@ -9,5 +9,5 @@
     ],
     "abstractive_model": "Qwen/Qwen2.5-0.5B-Instruct",
     "max_new_tokens": 256,
-    "data_path": "data/test.json"
+    "data_path": "data/space_summ_test.json"
 }
