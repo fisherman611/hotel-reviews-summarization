@@ -310,7 +310,7 @@ def call_deepseek(messages, *, temperature=0, top_p=0.95, max_tokens=8192, sleep
         time.sleep(sleep_before)
     
     payload = {
-        "model": "deepseek-ai/deepseek-v3.2",
+        "model": "deepseek-ai/deepseek-v3.1-terminus",
         "temperature": temperature,
         "top_p": top_p,
         "max_tokens": max_tokens,
