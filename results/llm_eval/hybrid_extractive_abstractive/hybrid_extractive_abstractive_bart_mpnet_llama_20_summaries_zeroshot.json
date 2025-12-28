@@ -1,0 +1,2202 @@
+[
+  {
+    "entity_id": "198738",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 4,
+            "groundedness": 5,
+            "overall_quality": 4.25
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 4,
+            "groundedness": 5,
+            "overall_quality": 4.25
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 4,
+            "groundedness": 5,
+            "overall_quality": 4.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 4,
+            "groundedness": 5,
+            "overall_quality": 4.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 4,
+            "groundedness": 5,
+            "overall_quality": 4.25
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "198738",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.833,
+        "coherence": 3.833,
+        "engagingness": 3.833,
+        "groundedness": 4.833,
+        "overall_quality": 4.083
+      }
+    }
+  },
+  {
+    "entity_id": "203139",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 1,
+            "overall_quality": 2.0
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "203139",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 2.0,
+        "engagingness": 2.0,
+        "groundedness": 1.833,
+        "overall_quality": 2.208
+      }
+    }
+  },
+  {
+    "entity_id": "209383",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "209383",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 4.0,
+        "coherence": 3.0,
+        "engagingness": 3.0,
+        "groundedness": 2.0,
+        "overall_quality": 3.0
+      }
+    }
+  },
+  {
+    "entity_id": "223757",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.5
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 3,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.75
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "223757",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.667,
+        "coherence": 2.833,
+        "engagingness": 2.667,
+        "groundedness": 3.167,
+        "overall_quality": 3.083
+      }
+    }
+  },
+  {
+    "entity_id": "224665",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "224665",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 3.0,
+        "engagingness": 3.0,
+        "groundedness": 3.333,
+        "overall_quality": 3.083
+      }
+    }
+  },
+  {
+    "entity_id": "227464",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 2,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 1,
+            "overall_quality": 1.75
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 2,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 1,
+            "overall_quality": 1.75
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 2,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "227464",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 2.5,
+        "coherence": 2.5,
+        "engagingness": 2.333,
+        "groundedness": 1.833,
+        "overall_quality": 2.292
+      }
+    }
+  },
+  {
+    "entity_id": "228653",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.75
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.5
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "228653",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.333,
+        "coherence": 3.333,
+        "engagingness": 2.833,
+        "groundedness": 2.667,
+        "overall_quality": 3.042
+      }
+    }
+  },
+  {
+    "entity_id": "228986",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 1,
+            "overall_quality": 2.0
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "228986",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.833,
+        "coherence": 2.833,
+        "engagingness": 2.833,
+        "groundedness": 2.0,
+        "overall_quality": 2.875
+      }
+    }
+  },
+  {
+    "entity_id": "229042",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "229042",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 3.0,
+        "engagingness": 2.0,
+        "groundedness": 2.0,
+        "overall_quality": 2.5
+      }
+    }
+  },
+  {
+    "entity_id": "229066",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 5,
+            "overall_quality": 4
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "229066",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.167,
+        "coherence": 3.167,
+        "engagingness": 2.833,
+        "groundedness": 3.333,
+        "overall_quality": 3.125
+      }
+    }
+  },
+  {
+    "entity_id": "229124",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "229124",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 3.0,
+        "engagingness": 3.0,
+        "groundedness": 2.0,
+        "overall_quality": 2.75
+      }
+    }
+  },
+  {
+    "entity_id": "232953",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 2,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 2,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "232953",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 2.667,
+        "coherence": 2.667,
+        "engagingness": 2.667,
+        "groundedness": 2.667,
+        "overall_quality": 2.667
+      }
+    }
+  },
+  {
+    "entity_id": "234572",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 2,
+            "coherence": 1,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 1.75
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 2,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 1,
+            "overall_quality": 1.75
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.75
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "234572",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 2.667,
+        "coherence": 2.5,
+        "engagingness": 2.667,
+        "groundedness": 2.5,
+        "overall_quality": 2.583
+      }
+    }
+  },
+  {
+    "entity_id": "235216",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.75
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.5
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.5
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.75
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.5
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.75
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "235216",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 4.0,
+        "coherence": 3.5,
+        "engagingness": 3.0,
+        "groundedness": 4.0,
+        "overall_quality": 3.625
+      }
+    }
+  },
+  {
+    "entity_id": "237193",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "237193",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 2.0,
+        "engagingness": 2.0,
+        "groundedness": 2.0,
+        "overall_quality": 2.25
+      }
+    }
+  },
+  {
+    "entity_id": "241742",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 1,
+            "overall_quality": 2
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 1,
+            "overall_quality": 2
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.25
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "241742",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 2.5,
+        "engagingness": 2.5,
+        "groundedness": 2.5,
+        "overall_quality": 2.625
+      }
+    }
+  },
+  {
+    "entity_id": "248861",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "248861",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 2.0,
+        "engagingness": 2.0,
+        "groundedness": 2.0,
+        "overall_quality": 2.25
+      }
+    }
+  },
+  {
+    "entity_id": "250023",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.5
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.75
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.75
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.75
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "250023",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.667,
+        "coherence": 3.333,
+        "engagingness": 2.667,
+        "groundedness": 3.333,
+        "overall_quality": 3.25
+      }
+    }
+  },
+  {
+    "entity_id": "2514386",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "2514386",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 3.0,
+        "engagingness": 3.0,
+        "groundedness": 3.0,
+        "overall_quality": 3.0
+      }
+    }
+  },
+  {
+    "entity_id": "2514725",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "2514725",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 2.167,
+        "engagingness": 2.167,
+        "groundedness": 2.167,
+        "overall_quality": 2.375
+      }
+    }
+  },
+  {
+    "entity_id": "2514747",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 2,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 1,
+            "overall_quality": 1.75
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 2,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 1,
+            "overall_quality": 1.75
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "2514747",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 2.667,
+        "coherence": 2.667,
+        "engagingness": 2.667,
+        "groundedness": 2.5,
+        "overall_quality": 2.625
+      }
+    }
+  },
+  {
+    "entity_id": "2515098",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "2515098",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 2.0,
+        "engagingness": 2.0,
+        "groundedness": 2.0,
+        "overall_quality": 2.25
+      }
+    }
+  },
+  {
+    "entity_id": "2515152",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 4,
+            "engagingness": 3,
+            "groundedness": 4,
+            "overall_quality": 3.75
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 2,
+            "groundedness": 3,
+            "overall_quality": 2.75
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 2,
+            "groundedness": 2,
+            "overall_quality": 2.25
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 3,
+            "overall_quality": 3.0
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "2515152",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.167,
+        "coherence": 2.833,
+        "engagingness": 2.5,
+        "groundedness": 2.833,
+        "overall_quality": 2.833
+      }
+    }
+  },
+  {
+    "entity_id": "2516007",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 4,
+            "coherence": 3,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 3.0
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "2516007",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 4.0,
+        "coherence": 3.0,
+        "engagingness": 3.0,
+        "groundedness": 2.0,
+        "overall_quality": 3.0
+      }
+    }
+  },
+  {
+    "entity_id": "2516165",
+    "per_aspect": [
+      {
+        "aspect": "service",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "building",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "location",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "cleanliness",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "food",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      },
+      {
+        "aspect": "rooms",
+        "generated_summary_eval": {
+          "scores": {
+            "naturalness": 3,
+            "coherence": 2,
+            "engagingness": 3,
+            "groundedness": 2,
+            "overall_quality": 2.5
+          }
+        }
+      }
+    ],
+    "overall": {
+      "entity_id": "2516165",
+      "num_aspects_evaluated": 6,
+      "generated_summary_avg": {
+        "naturalness": 3.0,
+        "coherence": 2.0,
+        "engagingness": 3.0,
+        "groundedness": 2.0,
+        "overall_quality": 2.5
+      }
+    }
+  }
+]
